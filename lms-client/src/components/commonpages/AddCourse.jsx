@@ -12,9 +12,10 @@ import {
   Users,
   DollarSign,
   Tag,
+  Plus
 } from 'lucide-react';
 import { addCourse } from '../../api/course';
-import { getAllCourseCategories } from '../../api/common';
+import { getAllCourseCategories, createCourseCategory } from '../../api/common';
 
 export default function AddCourse() {
   const [formData, setFormData] = useState({
@@ -44,23 +45,29 @@ export default function AddCourse() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeSection, setActiveSection] = useState('basic'); // 'basic', 'details', 'content'
+  const [activeSection, setActiveSection] = useState('basic');
   const [previewImage, setPreviewImage] = useState(null);
 
-  // Fetch categories on mount
+  // Modal states for adding category
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  const [addingCategory, setAddingCategory] = useState(false);
+
+  // Fetch categories
+  const fetchCategories = async () => {
+    setLoadingCategories(true);
+    setCategoryError(null);
+    try {
+      const data = await getAllCourseCategories();
+      setCategories(data);
+    } catch (error) {
+      setCategoryError('Failed to load categories');
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      setLoadingCategories(true);
-      setCategoryError(null);
-      try {
-        const data = await getAllCourseCategories();
-        setCategories(data);
-      } catch (error) {
-        setCategoryError('Failed to load categories');
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
     fetchCategories();
   }, []);
 
@@ -85,7 +92,7 @@ export default function AddCourse() {
     setNotification({ show: true, type, message });
     setTimeout(() => {
       setNotification({ show: false, type: '', message: '' });
-    }, 5000);
+    }, 4000);
   };
 
   const handleSubmit = async (e) => {
@@ -98,10 +105,10 @@ export default function AddCourse() {
         data.append(key, formData[key]);
       }
 
-      await addCourse(data); // Send FormData
+      await addCourse(data);
       showNotification('success', 'Course added successfully!');
 
-      // reset
+      // reset form
       setFormData({
         title: '',
         description: '',
@@ -126,36 +133,51 @@ export default function AddCourse() {
     }
   };
 
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) {
+      showNotification('error', 'Category name is required');
+      return;
+    }
+    setAddingCategory(true);
+    try {
+      await createCourseCategory({ title: newCategory.trim() });
+      showNotification('success', 'Category added successfully!');
+      setNewCategory('');
+      setShowCategoryModal(false);
+      await fetchCategories(); // Refresh dropdown
+    } catch (error) {
+      console.error(error);
+      showNotification('error', 'Error adding category');
+    } finally {
+      setAddingCategory(false);
+    }
+  };
+
   const FormSections = {
     basic: (
       <>
         {/* Title */}
         <div className="col-span-2">
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Course Title<span className="text-red-500">*</span>
           </label>
           <input
-            id="title"
             name="title"
             value={formData.title}
             placeholder="Enter course title"
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Category */}
         <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <Tag className="w-4 h-4 mr-2 text-blue-500" />
-            Category<span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
+            <span className="flex items-center">
+              <Tag className="w-4 h-4 mr-2 text-blue-500" />
+              Category<span className="text-red-500">*</span>
+            </span>
           </label>
 
           {loadingCategories ? (
@@ -164,77 +186,76 @@ export default function AddCourse() {
             <p className="text-red-500 text-sm">{categoryError}</p>
           ) : (
             <select
-              id="category"
               name="category"
               value={formData.category}
-              onChange={handleChange}
+              onChange={(e) => {
+                if (e.target.value === '__add_new__') {
+                  setShowCategoryModal(true);
+                  // Reset category selection to avoid selecting the "add new" option
+                  setFormData((prev) => ({ ...prev, category: '' }));
+                } else {
+                  setFormData((prev) => ({ ...prev, category: e.target.value }));
+                }
+              }}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
             >
               <option value="" disabled>
                 -- Select a category --
               </option>
               {categories.map((cat) => (
-                <option key={cat._id || cat.id || cat.title} value={cat.title}>
+                <option key={cat._id} value={cat.title}>
                   {cat.title}
                 </option>
               ))}
+              <option value="__add_new__" className="font-semibold text-blue-600">
+                + Add New Category
+              </option>
             </select>
           )}
         </div>
 
         {/* Instructor */}
         <div>
-          <label
-            htmlFor="instructor"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
             <Users className="w-4 h-4 mr-2 text-blue-500" />
             Instructor
           </label>
           <input
-            id="instructor"
             name="instructor"
             value={formData.instructor}
             placeholder="Instructor name"
             onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        
+        {/* Description */}
         <div className="col-span-2">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
             <FileText className="w-4 h-4 mr-2 text-blue-500" />
             Description<span className="text-red-500">*</span>
           </label>
           <textarea
-            id="description"
             name="description"
             value={formData.description}
             placeholder="Describe what students will learn"
             onChange={handleChange}
             required
             rows="4"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-      
+        {/* Image Upload */}
         <div className="col-span-2">
-          <label
-            htmlFor="courseImage"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
+          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
             <Upload className="w-4 h-4 mr-2 text-blue-500" />
             Cover Image
           </label>
           <div className="flex items-center space-x-4">
             <div
-              className={`w-full border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors ${
+              className={`w-full border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 ${
                 previewImage ? 'border-blue-300' : 'border-gray-300'
               }`}
             >
@@ -262,9 +283,6 @@ export default function AddCourse() {
                     <span className="text-sm text-gray-500">
                       Click to upload course image
                     </span>
-                    <span className="text-xs text-gray-400 mt-1">
-                      Recommended size: 1280x720px
-                    </span>
                   </div>
                 )}
               </label>
@@ -273,198 +291,11 @@ export default function AddCourse() {
         </div>
       </>
     ),
-    details: (
-      <>
-        {/* Price Type */}
-        <div>
-          <label
-            htmlFor="priceType"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <DollarSign className="w-4 h-4 mr-2 text-blue-500" />
-            Price Type
-          </label>
-          <select
-            id="priceType"
-            name="priceType"
-            value={formData.priceType}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
-          >
-            <option value="Free">Free</option>
-            <option value="Paid">Paid</option>
-          </select>
-        </div>
-
-        {/* Price (conditional) */}
-        {formData.priceType === 'Paid' && (
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-            >
-              <DollarSign className="w-4 h-4 mr-2 text-blue-500" />
-              Price (USD)
-            </label>
-            <input
-              id="price"
-              name="price"
-              type="number"
-              value={formData.price}
-              placeholder="Enter price"
-              min="0"
-              step="0.01"
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-            />
-          </div>
-        )}
-
-        
-        <div>
-          <label
-            htmlFor="duration"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <Clock className="w-4 h-4 mr-2 text-blue-500" />
-            Duration
-          </label>
-          <input
-            id="duration"
-            name="duration"
-            value={formData.duration}
-            placeholder="e.g. 8 weeks, 12 hours"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-          />
-        </div>
-
-        
-        <div>
-          <label
-            htmlFor="level"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <BookOpen className="w-4 h-4 mr-2 text-blue-500" />
-            Level
-          </label>
-          <select
-            id="level"
-            name="level"
-            value={formData.level}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
-          >
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-            <option value="All Levels">All Levels</option>
-          </select>
-        </div>
-
-        
-        <div>
-          <label
-            htmlFor="language"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <Globe className="w-4 h-4 mr-2 text-blue-500" />
-            Language
-          </label>
-          <select
-            id="language"
-            name="language"
-            value={formData.language}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
-          >
-            <option value="English">English</option>
-            <option value="Spanish">Spanish</option>
-            <option value="French">French</option>
-            <option value="German">German</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Japanese">Japanese</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        
-        <div>
-          <label
-            htmlFor="certification"
-            className="block text-sm font-medium text-gray-700 mb-1 flex items-center"
-          >
-            <Award className="w-4 h-4 mr-2 text-blue-500" />
-            Certification
-          </label>
-          <select
-            id="certification"
-            name="certification"
-            value={formData.certification}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
-          >
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
-        </div>
-      </>
-    ),
-    content: (
-      <>
-        
-        <div className="col-span-2">
-          <label
-            htmlFor="prerequisites"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Prerequisites
-          </label>
-          <textarea
-            id="prerequisites"
-            name="prerequisites"
-            value={formData.prerequisites}
-            placeholder="Any required knowledge or skills"
-            required
-            onChange={handleChange}
-            rows="3"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            List any knowledge or skills that students should have before
-            taking this course
-          </p>
-        </div>
-
-        
-        <div className="col-span-2">
-          <label
-            htmlFor="syllabus"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Syllabus
-          </label>
-          <textarea
-            id="syllabus"
-            name="syllabus"
-            value={formData.syllabus}
-            placeholder="Course content structure"
-            required
-            onChange={handleChange}
-            rows="6"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Outline the modules, lessons, and topics covered in your course
-          </p>
-        </div>
-      </>
-    ),
   };
 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen w-full">
-      
+      {/* Notifications */}
       {notification.show && (
         <div
           className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg flex items-center gap-3 ${
@@ -473,26 +304,14 @@ export default function AddCourse() {
               : 'bg-red-100 border-l-4 border-red-500'
           }`}
         >
-          <div
-            className={`p-2 rounded-full ${
-              notification.type === 'success' ? 'bg-green-200' : 'bg-red-200'
-            }`}
-          >
-            {notification.type === 'success' ? (
-              <Check className="w-5 h-5 text-green-600" />
-            ) : (
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-            )}
-          </div>
-          <p
-            className={`font-medium ${
-              notification.type === 'success' ? 'text-green-800' : 'text-red-800'
-            }`}
-          >
-            {notification.message}
-          </p>
+          {notification.type === 'success' ? (
+            <Check className="w-5 h-5 text-green-600" />
+          ) : (
+            <AlertTriangle className="w-5 h-5 text-red-600" />
+          )}
+          <p>{notification.message}</p>
           <button
-            onClick={() => setNotification({ show: false, type: '', message: '' })}
+            onClick={() => setNotification({ show: false })}
             className="ml-auto text-gray-500 hover:text-gray-700"
           >
             <X className="w-5 h-5" />
@@ -500,148 +319,63 @@ export default function AddCourse() {
         </div>
       )}
 
+      {/* Add Category Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+            <h2 className="text-lg font-semibold mb-4">Add New Category</h2>
+            <input
+              type="text"
+              placeholder="Category title"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="w-full border px-4 py-2 rounded-lg mb-4"
+            />
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCategory}
+                disabled={addingCategory}
+                className={`px-4 py-2 text-white rounded-lg ${
+                  addingCategory ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {addingCategory ? 'Adding...' : 'Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="w-full bg-gradient-to-r from-blue-600 to-blue-400 p-8 rounded-b-3xl shadow-md">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold text-white">Create a New Course</h1>
-          <p className="text-blue-100 mt-2">
-            Share your knowledge with the world and inspire learners
-          </p>
-        </div>
+        <h1 className="text-3xl font-bold text-white">Create a New Course</h1>
       </div>
 
-      {/* Form Content */}
-      <div className="max-w-5xl mx-auto p-6 mt-6">
-        {/* Progress Tabs */}
-        <div className="flex mb-8 border-b">
-          <button
-            onClick={() => setActiveSection('basic')}
-            className={`pb-3 px-6 text-sm font-medium border-b-2 ${
-              activeSection === 'basic'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700'
-            } transition-all`}
-          >
-            Basic Information
-          </button>
-          <button
-            onClick={() => setActiveSection('details')}
-            className={`pb-3 px-6 text-sm font-medium border-b-2 ${
-              activeSection === 'details'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700'
-            } transition-all`}
-          >
-            Course Details
-          </button>
-          <button
-            onClick={() => setActiveSection('content')}
-            className={`pb-3 px-6 text-sm font-medium border-b-2 ${
-              activeSection === 'content'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent hover:border-gray-300 text-gray-500 hover:text-gray-700'
-            } transition-all`}
-          >
-            Course Content
-          </button>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" onSubmit={handleSubmit}>
-            {FormSections[activeSection]}
-
-            <div className="col-span-2 flex justify-between mt-8">
-              {activeSection !== 'basic' && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setActiveSection(activeSection === 'content' ? 'details' : 'basic')
-                  }
-                  className="px-6 py-3 rounded-lg text-gray-700 font-medium border border-gray-300 hover:bg-gray-50 transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
-                >
-                  Previous
-                </button>
-              )}
-
-              <div
-                className={`flex justify-${
-                  activeSection === 'basic' ? 'end' : 'between'
-                } ml-auto`}
-              >
-                {activeSection !== 'content' ? (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setActiveSection(activeSection === 'basic' ? 'details' : 'content')
-                    }
-                    className="px-6 py-3 rounded-lg text-white font-medium bg-blue-600 hover:bg-blue-700 transition-all focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`px-6 py-3 rounded-lg text-white font-medium flex items-center gap-2 ${
-                      isSubmitting
-                        ? 'bg-blue-400 cursor-not-allowed'
-                        : 'bg-blue-600 hover:bg-blue-700 transition-all focus:ring-4 focus:ring-blue-300'
-                    }`}
-                  >
-                    {isSubmitting ? 'Publishing Course...' : 'Publish Course'}
-                    {isSubmitting && (
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-          </form>
-        </div>
-
-        {/* Tips Card */}
-        <div className="mt-6 bg-blue-50 border border-blue-100 rounded-xl p-6">
-          <h3 className="text-lg font-medium text-blue-800 mb-2">Tips for a Great Course</h3>
-          <ul className="text-sm text-blue-700 space-y-2">
-            <li className="flex items-start">
-              <Check className="w-4 h-4 text-blue-500 mr-2 mt-0.5" />
-              Use a clear, descriptive title that tells students exactly what they'll learn
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 text-blue-500 mr-2 mt-0.5" />
-              Upload a high-quality, engaging cover image related to your course content
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 text-blue-500 mr-2 mt-0.5" />
-              Break your syllabus into digestible sections with clear learning outcomes
-            </li>
-            <li className="flex items-start">
-              <Check className="w-4 h-4 text-blue-500 mr-2 mt-0.5" />
-              Be specific about prerequisites so students know if the course is right for them
-            </li>
-          </ul>
-        </div>
+      {/* Form */}
+      <div className="max-w-5xl mx-auto p-6 mt-6 bg-white rounded-xl shadow-sm">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {FormSections[activeSection]}
+          <div className="col-span-2 flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`px-6 py-3 rounded-lg text-white font-medium ${
+                isSubmitting
+                  ? 'bg-blue-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {isSubmitting ? 'Publishing...' : 'Publish Course'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
 }
-//lms
