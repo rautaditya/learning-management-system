@@ -17,7 +17,7 @@ import ManageVideo from '../pages/superadmin/ManageVideo';
 import SuperadminProfile from '../pages/superadmin/SuperadminProfile';
 import AddStudyMaterial from '../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
-
+import AddCourseCategory from '../components/commonpages/AddCourseCategory';
 export function SuperadminRoutes() {
   return (
     <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
