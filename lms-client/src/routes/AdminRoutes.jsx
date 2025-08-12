@@ -9,7 +9,7 @@ import ManageVideo from '../components/commonpages/ManageVideo';
 import Discussion from '../pages/admin/Discussion';
 import StudentProgress from '../pages/admin/Student Progress';
 import Certificates from '../pages/admin/Certificates';
-import Instructors from '../pages/admin/Instructors';
+
 import Reports from '../pages/admin/Reports';
 import Settings from '../pages/admin/Settings';
 import AddCourse from '../components/commonpages/AddCourse';
@@ -28,6 +28,7 @@ import AddStudyMaterial from '../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
 import QuestionPaper from '../pages/admin/QuestionPaper';
 import AddCourseCategory from '../components/commonpages/AddCourseCategory';
+import Instructors from '../components/commonpages/Instructors';
 
 
 export  function AdminRoutes() {
@@ -45,7 +46,7 @@ export  function AdminRoutes() {
         <Route path="discussion" element={<Discussion />} />
         <Route path="studentprogress" element={<StudentProgress />} />
         <Route path="certificates" element={<Certificates />} />
-        <Route path="instructors" element={<Instructors />} />
+        
         <Route path="reports" element={<Reports />} />
         <Route path="settings" element={<Settings />} />
         <Route path="courses/add" element={<AddCourse />} />
@@ -61,7 +62,7 @@ export  function AdminRoutes() {
 <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
  <Route path="questionpaper/:id" element={<QuestionPaper />} />
  <Route path="course-category" element={<AddCourseCategory />} />
-
+ <Route path="instructors" element={<Instructors />} />
 
       </Route>
     </Route>

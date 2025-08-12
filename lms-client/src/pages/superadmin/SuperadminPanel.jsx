@@ -24,6 +24,8 @@ import EnrollmentLogs from '../../components/commonpages/EnrollmentLogs';
 import AddStudyMaterial from '../../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../../components/commonpages/ManageStudyMaterial';
 import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
+import Instructors from '../../components/commonpages/Instructors';
+
 const SuperAdminPanel = () => {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -55,7 +57,7 @@ const SuperAdminPanel = () => {
             <Route path="reports" element={<Sreports />} />
             <Route path="settings" element={<Ssettings />} />
             <Route path="profile" element={<SuperadminProfile />} />
-
+<Route path="instructors" element={<Instructors />} />
             <Route path='studymaterial/add' element={<AddStudyMaterial />} />
             <Route path='studymaterial/manage' element={<ManageStudyMaterial />} />
 

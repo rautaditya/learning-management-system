@@ -378,6 +378,8 @@ const CourseProgress = require('../models/CourseProgress');
 const Enrollment = require('../models/Enrollment');
 const StudentExamSubmission = require('../models/StudentExamSubmission');
 const CourseCategory = require('../models/CourseCategory');
+const Instructor = require('../models/Instructor');  
+
 
 exports.submitContactForm = async (req, res) => {
   try {
@@ -871,3 +873,131 @@ exports.deleteCourseCategory = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+
+// Add new instructor
+exports.addInstructor = async (req, res) => {
+    try {
+        const { fullName, email, department } = req.body;
+
+        // Basic validation
+        if (!fullName || !email || !department) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Check if email already exists
+        const existingInstructor = await Instructor.findOne({ email });
+        if (existingInstructor) {
+            return res.status(409).json({ message: 'Instructor with this email already exists' });
+        }
+
+        // Create and save new instructor
+        const newInstructor = new Instructor({
+            fullName,
+            email,
+            department
+        });
+
+        await newInstructor.save();
+
+        res.status(201).json({
+            message: 'Instructor added successfully',
+            instructor: newInstructor
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+
+// const Instructor = require('../models/Instructor');
+
+// Get all instructors
+exports.getInstructors = async (req, res) => {
+    try {
+        const instructors = await Instructor.find().sort({ createdAt: -1 }); // Latest first
+        res.status(200).json({
+            success: true,
+            count: instructors.length,
+            data: instructors
+        });
+    } catch (error) {
+        console.error('Error fetching instructors:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error',
+            error: error.message
+        });
+    }
+};
+
+
+
+// Update Instructor by ID
+exports.updateInstructor = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { fullName, email, department } = req.body;
+
+        // Find and update
+        const updatedInstructor = await Instructor.findByIdAndUpdate(
+            id,
+            { fullName, email, department },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedInstructor) {
+            return res.status(404).json({
+                success: false,
+                message: "Instructor not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Instructor updated successfully",
+            data: updatedInstructor
+        });
+    } catch (error) {
+        console.error("Error updating instructor:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+            error: error.message
+        });
+    }
+};
+
+
+
+// Delete Instructor by ID
+exports.deleteInstructor = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deletedInstructor = await Instructor.findByIdAndDelete(id);
+
+        if (!deletedInstructor) {
+            return res.status(404).json({
+                success: false,
+                message: "Instructor not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Instructor deleted successfully"
+        });
+    } catch (error) {
+        console.error("Error deleting instructor:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error",
+            error: error.message
+        });
+    }
+};
+
+

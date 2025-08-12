@@ -18,6 +18,8 @@ import SuperadminProfile from '../pages/superadmin/SuperadminProfile';
 import AddStudyMaterial from '../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
 import AddCourseCategory from '../components/commonpages/AddCourseCategory';
+import Instructors from '../components/commonpages/Instructors';
+
 export function SuperadminRoutes() {
   return (
     <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
@@ -39,6 +41,8 @@ export function SuperadminRoutes() {
         
         <Route path="studymaterial/add" element={<AddStudyMaterial />} />
 <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
+
+ <Route path="instructors" element={<Instructors />} />
       </Route>
 
       {/* this one is fine as it's outside nested layout */}

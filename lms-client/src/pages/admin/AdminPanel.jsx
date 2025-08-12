@@ -18,7 +18,7 @@ import EnrollmentLogs from '../../components/commonpages/EnrollmentLogs';
 import Discussion from './Discussion';
 import StudentProgress from './Student Progress';
 import Certificates from './Certificates';  
-import Instructors from './Instructors';
+import Instructors from '../../components/commonpages/Instructors';
 import Reports from './Reports';
 import Settings from './Settings';
 import AddCourse from '../../components/commonpages/AddCourse';
@@ -69,7 +69,7 @@ const AdminPanel = () => {
             <Route path="discussion" element={<Discussion />} />
            <Route path="studentprogress" element={<StudentProgress />} />
            <Route path="certificates" element={<Certificates />} />
-           <Route path="instructors" element={<Instructors />} />
+            <Route path="instructors" element={<Instructors />} />
     <Route path="reports" element={<Reports />} />
    <Route path="settings" element={<Settings />} />
     <Route path="/courses/add" element={<AddCourse/>} />

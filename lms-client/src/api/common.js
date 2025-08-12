@@ -151,3 +151,36 @@ export const deleteCourseCategory = async (id) => {
     throw error.response?.data || { message: 'Failed to delete category' };
   }
 };
+
+// Add instructor
+export const addInstructor = async (instructorData) => {
+    try {
+        const res = await axiosInstance.post(`/add-instructor`, instructorData);
+        return res.data;
+    } catch (error) {
+        throw error.response ? error.response.data : { message: 'Network error' };
+    }
+};
+
+// Get all instructors
+export const getInstructors = async () => {
+    try {
+        const response = await axiosInstance.get(`/instructors`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching instructors:", error);
+        throw error;
+    }
+};
+
+// Update Instructor
+export const updateInstructor = async (id, updatedData) => {
+    const response = await axiosInstance.put(`/instructors/${id}`, updatedData);
+    return response.data;
+};
+
+// Delete Instructor
+export const deleteInstructor = async (id) => {
+    const response = await axiosInstance.delete(`/instructors/${id}`);
+    return response.data;
+};

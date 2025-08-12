@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   LayoutDashboard, UserCog, BookOpen, Building, FileBarChart,
-  Settings, LogOut, ShieldPlus, Users, ClipboardList, Film
+  Settings, LogOut, ShieldPlus, Users, ClipboardList, Film , UserCheck
 } from 'lucide-react';
 
 const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
@@ -48,6 +48,8 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
         { path: '/superadmin/ManageVideo', label: 'Manage Video' },
       ]
     },
+
+    { path: '/superadmin/instructors', icon: <UserCheck size={20} />, label: 'Instructors' },
     { path: '/superadmin/institutes', icon: <Building size={20} />, label: 'Institutes' },
     { path: '/superadmin/contactdata', icon: <UserCog size={20} />, label: 'Contact Data' },
     { path: '/superadmin/reports', icon: <FileBarChart size={20} />, label: 'Reports' },

@@ -8,7 +8,7 @@ const { verifyToken } = require('../middleware/authMiddleware');
 const {
   createAssignment, addVideoToCourse, getAllVideos,
   getAllAssignments, updateAssignment, deleteAssignment,updateVideo,deleteVideo,getAllStudents,updateStudent,deleteStudent,getDashboardStats,addStudyMaterial
-,getCourseEnrollmentsWithProgress,getStudentCourseProgress} = require('../controllers/commonController');
+,getCourseEnrollmentsWithProgress,getStudentCourseProgress,addInstructor,getInstructors,updateInstructor,deleteInstructor} = require('../controllers/commonController');
 
 const {
   uploadSingleVideo,
@@ -45,5 +45,12 @@ router.get('/course-categories',verifyToken(['admin', 'superadmin']), commonCont
 router.put('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.updateCourseCategory);
 router.delete('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.deleteCourseCategory);
 
+
+// POST /api/instructors/add
+router.post("/add-instructor",verifyToken(['admin', 'superadmin']), addInstructor);
+router.get('/instructors',verifyToken(['admin', 'superadmin']), getInstructors);
+router.put('/instructors/:id',verifyToken(['admin', 'superadmin']), updateInstructor);
+// DELETE instructor
+router.delete('/instructors/:id',verifyToken(['admin', 'superadmin']), deleteInstructor);
 //lms
 module.exports = router;
