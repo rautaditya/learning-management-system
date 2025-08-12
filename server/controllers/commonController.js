@@ -377,7 +377,8 @@ const StudyMaterial = require('../models/StudyMaterial');
 const CourseProgress = require('../models/CourseProgress');
 const Enrollment = require('../models/Enrollment');
 const StudentExamSubmission = require('../models/StudentExamSubmission');
-  
+const CourseCategory = require('../models/CourseCategory');
+
 exports.submitContactForm = async (req, res) => {
   try {
     const { name, email, department, subject, message } = req.body;
@@ -794,7 +795,7 @@ exports.getAllCourseStudents = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-const CourseCategory = require('../models/CourseCategory');
+
 
 exports.createCourseCategory = async (req, res) => {
   try {
@@ -818,4 +819,54 @@ exports.createCourseCategory = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+exports.getAllCourseCategories = async (req, res) => {
+  try {
+    const categories = await CourseCategory.find().sort({ createdAt: -1 });
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error('Error fetching course categories:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
 
+exports.updateCourseCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Title is required' });
+    }
+
+    const updatedCategory = await CourseCategory.findByIdAndUpdate(
+      id,
+      { title: title.trim() },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json(updatedCategory);
+  } catch (error) {
+    console.error('Error updating course category:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.deleteCourseCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedCategory = await CourseCategory.findByIdAndDelete(id);
+
+    if (!deletedCategory) {
+      return res.status(404).json({ message: 'Category not found' });
+    }
+
+    res.status(200).json({ message: 'Category deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting course category:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

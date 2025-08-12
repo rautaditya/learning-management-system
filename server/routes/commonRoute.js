@@ -41,5 +41,9 @@ router.get('/course-progress/:courseId', commonController.getCourseStudents);
 router.get('/progress/full/:courseId/:studentId', verifyToken(['admin', 'superadmin']), commonController.getFullStudentProgress);
 router.get('/course-progress/all', verifyToken(['admin', 'superadmin']), commonController.getAllCourseStudents);
 router.post('/course-category', verifyToken(['admin', 'superadmin'],), commonController.createCourseCategory);
+router.get('/course-categories',verifyToken(['admin', 'superadmin']), commonController.getAllCourseCategories);
+router.put('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.updateCourseCategory);
+router.delete('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.deleteCourseCategory);
+
 
 module.exports = router;

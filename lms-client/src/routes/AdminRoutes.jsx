@@ -58,9 +58,9 @@ export  function AdminRoutes() {
         <Route path="enrolledcourses" element={<EnrolledCourses />} />
         <Route path="enrollments" element={<EnrollmentLogs />} />
         <Route path="studymaterial/add" element={<AddStudyMaterial />} />
-<Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
- <Route path="questionpaper/:id" element={<QuestionPaper />} />
- <Route path="course-category" element={<AddCourseCategory />} />
+        <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
+        <Route path="questionpaper/:id" element={<QuestionPaper />} />
+        <Route path="course-category" element={<AddCourseCategory />} />
 
 
       </Route>

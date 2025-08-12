@@ -27,6 +27,7 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
       children: [
         { path: '/superadmin/courses/add', label: 'Add Courses' },
         { path: '/superadmin/courses/manage', label: 'Manage Course' },
+        { path: '/superadmin/course-category', label: 'Categories' }
       ]
     },
     {

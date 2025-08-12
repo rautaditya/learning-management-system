@@ -121,3 +121,33 @@ export const createCourseCategory = async (categoryData) => {
     throw error.response?.data || { message: 'Something went wrong' };
   }
 };
+export const getAllCourseCategories = async () => {
+  try {
+    const response = await axiosInstance.get('/course-categories');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching course categories:', error);
+    throw error.response?.data || { message: 'Failed to fetch course categories' };
+  }
+};
+
+export const updateCourseCategory = async (id, formData) => {
+  try {
+    const response = await axiosInstance.put(`/course-categories/${id}`, formData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating course category:', error);
+    throw error.response?.data || { message: 'Failed to update category' };
+  }
+};
+
+
+export const deleteCourseCategory = async (id) => {
+  try {
+    const response = await axiosInstance.delete(`/course-categories/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting course category:', error);
+    throw error.response?.data || { message: 'Failed to delete category' };
+  }
+};

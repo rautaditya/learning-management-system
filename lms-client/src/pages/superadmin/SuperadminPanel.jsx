@@ -23,7 +23,7 @@ import EnrollmentLogs from '../../components/commonpages/EnrollmentLogs';
 
 import AddStudyMaterial from '../../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../../components/commonpages/ManageStudyMaterial';
-
+import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
 const SuperAdminPanel = () => {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -42,7 +42,7 @@ const SuperAdminPanel = () => {
             <Route path="courses/add" element={<AddCourse/>} />
             <Route path="courses/manage" element={<ManageAllCourses />} />
             <Route path="courses/:id" element={<CourseDetails />} />
-            {/* <Route path="ManageCourses" element={<ManageCourses />} /> */}
+            <Route path="course-category" element={<AddCourseCategory />} />
             <Route path="addassignment" element={<AddAssignment />} />
             <Route path="assignment" element={<ManageAssignment />} />
             <Route path="users" element={<ManageStudents />} />

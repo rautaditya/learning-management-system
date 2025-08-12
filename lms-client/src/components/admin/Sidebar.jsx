@@ -25,19 +25,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const menuItems = [
     { path: '/admin/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     {
-      label: 'Category',
-      icon: <BookOpen size={20} />,
-      children: [
-        { path: '/admin/course-category', label: 'AddCourse' },
-      ]
-    },
-    {
       label: 'Courses',
       icon: <BookOpen size={20} />,
       children: [
         { path: '/admin/courses/add', label: 'AddCourse' },
         { path: '/admin/courses/manage', label: 'ManageCourse' },
-        { path: '/admin/enrolledcourses', label: 'Enrolled Courses' }
+        { path: '/admin/enrolledcourses', label: 'Enrolled Courses' },
+        { path: '/admin/course-category', label: 'Categories' }
       ]
     },
 
