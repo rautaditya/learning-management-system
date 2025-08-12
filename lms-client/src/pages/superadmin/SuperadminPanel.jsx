@@ -42,14 +42,14 @@ const SuperAdminPanel = () => {
             <Route path="courses/add" element={<AddCourse/>} />
             <Route path="courses/manage" element={<ManageAllCourses />} />
             <Route path="courses/:id" element={<CourseDetails />} />
-            <Route path="course-category" element={<AddCourseCategory />} />
+            {/* <Route path="ManageCourses" element={<ManageCourses />} /> */}
             <Route path="addassignment" element={<AddAssignment />} />
             <Route path="assignment" element={<ManageAssignment />} />
             <Route path="users" element={<ManageStudents />} />
             <Route path="enrollments" element={<EnrollmentLogs />} />
             <Route path="AddVideo" element={<AddVideo />} />
             <Route path="ManageVideo" element={<ManageVideo />} />
-
+            <Route path="course-category" element={<AddCourseCategory />} />
             <Route path="institutes" element={<InstituteList />} />
             <Route path="contactdata" element={<ContactData />} />
             <Route path="reports" element={<Sreports />} />

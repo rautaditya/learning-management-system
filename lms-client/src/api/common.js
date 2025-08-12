@@ -141,7 +141,7 @@ export const updateCourseCategory = async (id, formData) => {
   }
 };
 
-
+//lms
 export const deleteCourseCategory = async (id) => {
   try {
     const response = await axiosInstance.delete(`/course-categories/${id}`);

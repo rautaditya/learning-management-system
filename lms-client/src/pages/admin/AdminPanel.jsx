@@ -34,6 +34,7 @@ import AddStudyMaterial from '../../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../../components/commonpages/ManageStudyMaterial';
 import QuestionPaper from './QuestionPaper';
 import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
+//lms
 
 const AdminPanel = () => {
   const [collapsed, setCollapsed] = useState(false);

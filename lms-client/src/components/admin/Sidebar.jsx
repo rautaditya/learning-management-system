@@ -87,6 +87,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     setActivePath(path);
     navigate(path);
   };
+//lms
 
   const toggleDropdown = (label) => {
     setOpenDropdown(openDropdown === label ? null : label);

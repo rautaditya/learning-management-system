@@ -45,5 +45,5 @@ router.get('/course-categories',verifyToken(['admin', 'superadmin']), commonCont
 router.put('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.updateCourseCategory);
 router.delete('/course-categories/:id',verifyToken(['admin', 'superadmin']), commonController.deleteCourseCategory);
 
-
+//lms
 module.exports = router;

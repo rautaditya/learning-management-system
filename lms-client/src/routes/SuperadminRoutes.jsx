@@ -17,7 +17,7 @@ import ManageVideo from '../pages/superadmin/ManageVideo';
 import SuperadminProfile from '../pages/superadmin/SuperadminProfile';
 import AddStudyMaterial from '../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
-import AddCourseCategory from '../components/commonpages/AddCourseCategory';
+
 export function SuperadminRoutes() {
   return (
     <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
@@ -35,9 +35,10 @@ export function SuperadminRoutes() {
         <Route path="settings" element={<Ssettings />} />
         <Route path="logout" element={<Logout />} />
         <Route path="profile" element={<SuperadminProfile />} />
-         <Route path="course-category" element={<AddCourseCategory />} />
+        <Route path="course-category" element={<AddCourseCategory />} />
+        
         <Route path="studymaterial/add" element={<AddStudyMaterial />} />
-        <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
+<Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
       </Route>
 
       {/* this one is fine as it's outside nested layout */}
