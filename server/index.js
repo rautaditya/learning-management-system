@@ -13,6 +13,7 @@
 const paymentRoutes = require("./routes/paymentRoutes");
 const studyMaterialRoutes = require('./routes/studyMaterialRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+const certificateRoutes = require('./routes/certificateRoutes');
   // Middleware to parse JSON bodies
   app.use(express.json());
 
@@ -47,7 +48,7 @@ app.use("/api/payments", paymentRoutes);
 app.use('/api/exam', require('./routes/ExamRoute'));
 app.use('/api/',studyMaterialRoutes);
 app.use('/api/progress',progressRoutes);
-
+app.use('/api/',certificateRoutes);
   // Start the server
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {

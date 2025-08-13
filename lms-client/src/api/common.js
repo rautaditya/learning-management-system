@@ -184,3 +184,51 @@ export const deleteInstructor = async (id) => {
     const response = await axiosInstance.delete(`/instructors/${id}`);
     return response.data;
 };
+
+//cirtificate
+// frontend API additions (use same axiosInstance)
+export const createCertificateTemplate = async (formData) => {
+  // formData: FormData instance with fields: name, description, course (optional), image (file)
+  const res = await axiosInstance.post('/certificate-templates', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+};
+
+export const getCertificateTemplates = async () => {
+  const res = await axiosInstance.get('/certificate-templates');
+  return res.data;
+};
+
+export const getCertificateTemplateById = async (id) => {
+  const res = await axiosInstance.get(`/certificate-templates/${id}`);
+  return res.data;
+};
+
+export const updateCertificateTemplate = async (id, formData) => {
+  const res = await axiosInstance.put(`/certificate-templates/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+};
+
+export const deleteCertificateTemplate = async (id) => {
+  const res = await axiosInstance.delete(`/certificate-templates/${id}`);
+  return res.data;
+};
+
+// course - template link/unlink
+export const setCourseTemplate = async (courseId, templateId) => {
+  const res = await axiosInstance.post(`/courses/${courseId}/template`, { templateId });
+  return res.data;
+};
+
+export const getCourseTemplate = async (courseId) => {
+  const res = await axiosInstance.get(`/courses/${courseId}/template`);
+  return res.data;
+};
+// Get all courses (for dropdowns)
+export const getCourseList = async () => {
+  const res = await axiosInstance.get('/courses/list');
+  return res.data;
+};

@@ -29,7 +29,14 @@ const courseSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    // models/Course.js (add this field inside your courseSchema)
+template: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'CertificateTemplate',
+  default: null
+},
+
 });
 
 module.exports = mongoose.model('Course', courseSchema);
