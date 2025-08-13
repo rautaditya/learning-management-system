@@ -12,10 +12,11 @@ import {
   Users,
   DollarSign,
   Tag,
-  Plus
+  Plus,
 } from 'lucide-react';
 import { addCourse } from '../../api/course';
 import { getAllCourseCategories, createCourseCategory } from '../../api/common';
+import { getInstructors } from '../../api/common'; // import your instructors API
 
 export default function AddCourse() {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ export default function AddCourse() {
     courseImage: null,
     priceType: 'Free',
     price: 0,
-    instructor: '',
+    instructor: '', // will hold selected instructor name
     duration: '',
     level: 'Beginner',
     syllabus: '',
@@ -37,6 +38,10 @@ export default function AddCourse() {
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [categoryError, setCategoryError] = useState(null);
+
+  const [instructors, setInstructors] = useState([]);
+  const [loadingInstructors, setLoadingInstructors] = useState(true);
+  const [instructorError, setInstructorError] = useState(null);
 
   const [notification, setNotification] = useState({
     show: false,
@@ -67,8 +72,30 @@ export default function AddCourse() {
     }
   };
 
+  // Fetch instructors
+  const fetchInstructors = async () => {
+    setLoadingInstructors(true);
+    setInstructorError(null);
+    try {
+      const data = await getInstructors();
+      // Assuming data is { success: true, count: X, data: [instructors array] }
+      if (data && Array.isArray(data.data)) {
+        setInstructors(data.data);
+      } else {
+        setInstructors([]);
+        setInstructorError('Invalid instructors data');
+      }
+    } catch (error) {
+      setInstructorError('Failed to load instructors');
+      setInstructors([]);
+    } finally {
+      setLoadingInstructors(false);
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
+    fetchInstructors();
   }, []);
 
   const handleChange = (e) => {
@@ -189,9 +216,8 @@ export default function AddCourse() {
               name="category"
               value={formData.category}
               onChange={(e) => {
-                if (e.target.value === '__add_new__') {
+                if (e.target.value === '_add_new_') {
                   setShowCategoryModal(true);
-                  // Reset category selection to avoid selecting the "add new" option
                   setFormData((prev) => ({ ...prev, category: '' }));
                 } else {
                   setFormData((prev) => ({ ...prev, category: e.target.value }));
@@ -208,7 +234,7 @@ export default function AddCourse() {
                   {cat.title}
                 </option>
               ))}
-              <option value="__add_new__" className="font-semibold text-blue-600">
+              <option value="_add_new_" className="font-semibold text-blue-600">
                 + Add New Category
               </option>
             </select>
@@ -221,13 +247,26 @@ export default function AddCourse() {
             <Users className="w-4 h-4 mr-2 text-blue-500" />
             Instructor
           </label>
-          <input
-            name="instructor"
-            value={formData.instructor}
-            placeholder="Instructor name"
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          />
+
+          {loadingInstructors ? (
+            <p className="text-gray-500 text-sm">Loading instructors...</p>
+          ) : instructorError ? (
+            <p className="text-red-500 text-sm">{instructorError}</p>
+          ) : (
+            <select
+              name="instructor"
+              value={formData.instructor}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              <option value="">-- Select an instructor --</option>
+              {instructors.map((inst) => (
+                <option key={inst._id} value={inst.fullName}>
+                  {inst.fullName}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         {/* Description */}
@@ -260,6 +299,7 @@ export default function AddCourse() {
               }`}
             >
               <input
+              
                 id="courseImage"
                 name="courseImage"
                 type="file"
@@ -325,6 +365,7 @@ export default function AddCourse() {
           <div className="bg-white rounded-lg shadow-lg w-96 p-6">
             <h2 className="text-lg font-semibold mb-4">Add New Category</h2>
             <input
+              
               type="text"
               placeholder="Category title"
               value={newCategory}
