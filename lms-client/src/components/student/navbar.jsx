@@ -5,6 +5,7 @@ import {
   GraduationCap, FileText, ClipboardList, ListChecks, User, Settings, LogOut
 } from 'lucide-react';
 import Profile from '../../pages/student/Profile';
+import Mypurchase from '../../pages/student/Mypurchase';
 
 export default function Navbar({ onLoginClick }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function Navbar({ onLoginClick }) {
   const [token, setToken] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showPurchases, setShowPurchases] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,9 +89,6 @@ export default function Navbar({ onLoginClick }) {
     { name: 'Study Material', path: '/studymaterials', icon: <FileText className="w-4 h-4 mr-1" /> },
     { name: 'Assignments', path: '/assignments', icon: <ClipboardList className="w-4 h-4 mr-1" /> },
     { name: 'Exam', path: '/exam', icon: <ListChecks className="w-4 h-4 mr-1" /> },
-//     { name: 'Assignments', path: '/assignments'
-// , icon: <ClipboardList className="w-4 h-4 mr-1" /> },
-    // { name: 'Assignments', path: '/assignments', icon: <ClipboardList className="w-4 h-4 mr-1" /> },
   ];
 
   return (
@@ -148,26 +147,28 @@ export default function Navbar({ onLoginClick }) {
                     <div className={`absolute w-44 bg-white shadow-lg rounded-lg z-50 ${showDropdown ? 'block' : 'hidden'}`}>
                       <ul className="text-sm mt-0">
                         <li>
-                         <Link
-                        to="/profile"
-                      onClick={() => setShowDropdown(false)}
-                      className="block px-4 py-2 hover:bg-gray-100"
-                         >
-                         <User className="inline w-4 h-4 mr-1" />
-                             Profile
-                           </Link>
-
-
+                          <button
+                            onClick={() => {
+                              setShowProfileModal(true);
+                              setShowDropdown(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            <User className="inline w-4 h-4 mr-1" />
+                            Profile
+                          </button>
                         </li>
                         <li>
-                          <Link
-                            to="/student/settings"
-                            onClick={() => setShowDropdown(false)}
-                            className="block px-4 py-2 hover:bg-gray-100"
+                          <button
+                            onClick={() => {
+                              setShowPurchases(true);
+                              setShowDropdown(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
                             <Settings className="inline w-4 h-4 mr-1" />
-                            Settings
-                          </Link>
+                            My Purchases
+                          </button>
                         </li>
                         <li>
                           <button
@@ -205,6 +206,9 @@ export default function Navbar({ onLoginClick }) {
 
       {showProfileModal && (
         <Profile user={user} token={token} onClose={() => setShowProfileModal(false)} />
+      )}
+      {showPurchases && (
+        <Mypurchase user={user} token={token} onClose={() => setShowPurchases(false)} />
       )}
     </>
   );

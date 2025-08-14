@@ -230,3 +230,28 @@ export const updateStudentProfile = async (id, updatedData) => {
   }
 };
 
+// frontend/api/enrollment.js
+// import axiosInstance from './axiosInstance'; // your pre-configured Axios instance
+
+// export const getEnrollmentsByStudent = async () => {
+//   try {
+//     const response = await axiosInstance.get('/enrollments/student:id');
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching enrollments:", error);
+//     throw error;
+//   }
+// };
+
+// getcourseenrolledbystudent
+
+
+
+export const getPurchasedCourses = async (token) => {
+  const res = await axios.get("/enrollments/purchased", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

@@ -1,5 +1,5 @@
 // routes/StudentRoutes.jsx
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import StudentLayout from '../components/student/StudentLayout';
 import Home from '../pages/student/Home';
 import Contact from '../pages/student/Contact';
@@ -16,11 +16,14 @@ import TakeExam from '../components/student/TakeExam';
 import Exam from '../components/student/Exam';
 import Assignments from '../components/student/Assignments';
 import StudentStudyMaterials from '../pages/student/StudentStudyMaterials';
+import Mypurchase from '../pages/student/Mypurchase';
 
 export function StudentRoutes() {
+  const location = useLocation();
+  const state = location.state || {};
+
   return (
-    <>
-      {/* Routes with layout */}
+   <>
       <Route element={<StudentLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact />} />
@@ -34,16 +37,13 @@ export function StudentRoutes() {
         <Route path="/enroll" element={<EnrollPage />} />
         <Route path="/course/:id" element={<Classroom />} />
         <Route path="/exam" element={<Exam />} />
-<Route path="/assignments" element={<Assignments />} />
+        <Route path="/assignments" element={<Assignments />} />
         <Route path="/studymaterials" element={<StudentStudyMaterials />} />
-
-
       </Route>
-
-      {/* Route WITHOUT layout */}
       <Route path="/exam/:examId/take" element={<TakeExam />} />
-
-              
+      <Route path="/mypurchase" element={<Mypurchase />} />
     </>
+
+
   );
 }
