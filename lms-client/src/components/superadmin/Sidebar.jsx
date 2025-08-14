@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
-  LayoutDashboard, UserCog, BookOpen, Building, FileBarChart,
+  LayoutDashboard, UserCog, BookOpen, Building, FileBarChart,MessageSquare,BarChart3,Award,
   Settings, LogOut, ShieldPlus, Users, ClipboardList, Film , UserCheck, FileSpreadsheet
 } from 'lucide-react';
 
@@ -38,6 +38,14 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
             { path: '/superadmin/studymaterial/manage', label: 'ManageMaterial' }
           ]
         },
+      {
+      label: 'Exam',
+      icon: <BookOpen size={20} />,
+      children: [
+        { path: '/superadmin/createexam', label: 'CreateExam' },
+        { path: '/superadmin/manageexam', label: 'ManageExam' }
+      ]
+    },
     {
       label: 'Assignment',
       icon: <ClipboardList size={20} />, // Assignment icon
@@ -56,6 +64,9 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
         { path: '/superadmin/ManageVideo', label: 'Manage Video' },
       ]
     },
+    { path: '/superadmin/discussion', icon: <MessageSquare size={20} />, label: 'Discussion' },
+    { path: '/superadmin/studentprogress', icon: <BarChart3 size={20} />, label: 'Student Progress' },
+    { path: '/superadmin/certificates', icon: <Award size={20} />, label: 'Certificates' },
 
     { path: '/superadmin/instructors', icon: <UserCheck size={20} />, label: 'Instructors' },
     { path: '/superadmin/institutes', icon: <Building size={20} />, label: 'Institutes' },

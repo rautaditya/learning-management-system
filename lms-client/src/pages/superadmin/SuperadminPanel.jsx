@@ -5,7 +5,9 @@ import Header from '../../components/superadmin/Header';
 import AddAdmin from './AddAdmin.jsx'; 
 import Sdashboard from './Sdashboard';
 import ManageAdmins from './ManageAdmins';
-
+import Discussion from '../../pages/admin/Discussion';
+import StudentProgress from '../../pages/admin/Student Progress';
+import Certificates from '../../pages/admin/Certificates';  
 import ManageAllCourses from './ManageAllCourses.jsx';
 import AddAssignment from './AddAssignment.jsx';
 import ManageAssignment from './ManageAssignment.jsx';
@@ -25,7 +27,8 @@ import AddStudyMaterial from '../../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../../components/commonpages/ManageStudyMaterial';
 import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
 import Instructors from '../../components/commonpages/Instructors';
-
+import CreateExam from '../../pages/admin/CreateExam';
+import ManageExam from '../../pages/admin/ManageExam';
 const SuperAdminPanel = () => {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -60,7 +63,11 @@ const SuperAdminPanel = () => {
 <Route path="instructors" element={<Instructors />} />
             <Route path='studymaterial/add' element={<AddStudyMaterial />} />
             <Route path='studymaterial/manage' element={<ManageStudyMaterial />} />
-
+            <Route path="createexam" element={<CreateExam />} />
+            <Route path="manageexam" element={<ManageExam />} />
+            <Route path="discussion" element={<Discussion />} />
+            <Route path="studentprogress" element={<StudentProgress />} />
+            <Route path="certificates" element={<Certificates />} />
           </Routes>
         </main>
       </div>

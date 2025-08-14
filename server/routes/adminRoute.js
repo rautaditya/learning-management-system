@@ -20,13 +20,13 @@ router.put('/courses/:id', verifyToken(['admin']), uploadSingleImage, updateCour
 router.delete('/courses/:id', verifyToken(['admin']), deleteCourse);
 
 // router.post('/createexam', verifyToken(['admin']), createExam);
-router.post('/createexam', verifyToken(['admin']), createExam);
+router.post('/createexam', verifyToken(['admin', 'superadmin']), createExam);
 
-router.get('/exams', verifyToken(['admin']) , getExam);
+router.get('/exams', verifyToken(['admin', 'superadmin']) , getExam);
 // router.get('/exams/:id', verifyToken(['admin']),adminController.getExamById);
 
-router.put('/exam/:id',verifyToken(['admin']) ,updateExam);
-router.delete('/exam/:examId',verifyToken(['admin']), deleteExam);
+router.put('/exam/:id',verifyToken(['admin', 'superadmin']) ,updateExam);
+router.delete('/exam/:examId',verifyToken(['admin', 'superadmin']), deleteExam);
 
 router.get('/adminprofile', verifyToken(['admin']), getAdminProfile);
 router.get('/enrolledcourses', verifyToken(['admin']), getAllEnrollments);
