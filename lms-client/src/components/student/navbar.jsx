@@ -148,16 +148,16 @@ export default function Navbar({ onLoginClick }) {
                     <div className={`absolute w-44 bg-white shadow-lg rounded-lg z-50 ${showDropdown ? 'block' : 'hidden'}`}>
                       <ul className="text-sm mt-0">
                         <li>
-                          <button
-                            onClick={() => {
-                              setShowProfileModal(true);
-                              setShowDropdown(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                          >
-                            <User className="inline w-4 h-4 mr-1" />
-                            Profile
-                          </button>
+                         <Link
+                        to="/profile"
+                      onClick={() => setShowDropdown(false)}
+                      className="block px-4 py-2 hover:bg-gray-100"
+                         >
+                         <User className="inline w-4 h-4 mr-1" />
+                             Profile
+                           </Link>
+
+
                         </li>
                         <li>
                           <Link

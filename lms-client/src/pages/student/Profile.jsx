@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Pencil, X } from "lucide-react";
 import { getUserProfile, updateStudentProfile } from "../../api/student";
 
@@ -7,21 +8,31 @@ const Profile = ({ onClose }) => {
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const navigate = useNavigate();
+
+  // ✅ Removed "username" from requiredFields
+  const requiredFields = ["fullName", "mobile", "gender", "dob", "address"];
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getUserProfile();
-        setUser(data.user || data); // Adjust if API returns { user }
-        setFormData(data.user || data);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProfile();
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const data = await getUserProfile();
+      const profileData = data.user || data;
+      setUser(profileData);
+      setFormData(profileData);
+
+      const complete = requiredFields.every((f) => !!profileData[f]);
+      setIsProfileComplete(data.isComplete ?? complete);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackdropClick = (e) => {
     if (e.target.id === "profile-modal") onClose();
@@ -34,8 +45,6 @@ const Profile = ({ onClose }) => {
   const handleImageChange = (e, field) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Show preview immediately
     setFormData((prev) => ({
       ...prev,
       [field]: URL.createObjectURL(file),
@@ -45,17 +54,22 @@ const Profile = ({ onClose }) => {
 
   const handleSave = async () => {
     try {
-      const dataToSend = new FormData();
+      for (let field of requiredFields) {
+        if (!formData[field]) {
+          alert(`Please fill the ${field} field`);
+          return;
+        }
+      }
 
-      // Append editable fields
+      const dataToSend = new FormData();
       const readonlyFields = ["role", "status", "joiningDate", "isVerified"];
+
       Object.entries(formData).forEach(([key, value]) => {
         if (!readonlyFields.includes(key) && !key.endsWith("File")) {
           dataToSend.append(key, value);
         }
       });
 
-      // Append new image files if provided
       if (formData.profileImageFile) {
         dataToSend.append("profileImage", formData.profileImageFile);
       }
@@ -64,9 +78,13 @@ const Profile = ({ onClose }) => {
       }
 
       const res = await updateStudentProfile(user._id, dataToSend);
+      const updatedData = res.user || res;
+      setUser(updatedData);
+      setFormData(updatedData);
 
-      setUser(res.user || res);
-      setFormData(res.user || res);
+      const complete = requiredFields.every((f) => !!updatedData[f]);
+      setIsProfileComplete(res.isComplete ?? complete);
+
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (err) {
@@ -91,17 +109,17 @@ const Profile = ({ onClose }) => {
       onClick={handleBackdropClick}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
     >
-      <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg relative overflow-y-auto max-h-[95vh]">
+      <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg relative">
         {/* Close Button */}
         <button
-          onClick={onClose}
+         onClick={() => navigate(-1)}
           className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold z-50"
         >
           <X />
         </button>
 
-        {/* Background Image */}
-        <div className="relative h-44 w-full rounded-t-xl overflow-hidden">
+        {/* Background Image (smaller height) */}
+        <div className="relative h-32 w-full rounded-t-xl overflow-hidden">
           <img
             src={
               formData.backgroundImage?.startsWith("blob:")
@@ -127,7 +145,7 @@ const Profile = ({ onClose }) => {
         </div>
 
         {/* Profile Image */}
-        <div className="relative -mt-12 flex justify-center">
+        <div className="relative -mt-10 flex justify-center">
           <div className="relative">
             <img
               src={
@@ -138,7 +156,7 @@ const Profile = ({ onClose }) => {
                   : "https://via.placeholder.com/200"
               }
               alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border-4 border-white shadow"
+              className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
             />
             {isEditing && (
               <label className="absolute bottom-0 right-0 bg-white/70 backdrop-blur-sm rounded-full p-1 cursor-pointer hover:bg-white shadow">
@@ -155,21 +173,35 @@ const Profile = ({ onClose }) => {
         </div>
 
         {/* Profile Details */}
-        <div className="px-6 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-blue-600">My Profile</h2>
-            <button
-              onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-              {isEditing ? "Save" : "Edit"}
-            </button>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-blue-600">My Profile</h2>
+
+            {isEditing ? (
+              <button
+                onClick={handleSave}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className={`${
+                  !isProfileComplete
+                    ? "bg-yellow-500 hover:bg-yellow-600"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white px-4 py-2 rounded`}
+              >
+                {!isProfileComplete ? "Complete Profile" : "Edit"}
+              </button>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
               ["Full Name", "fullName"],
-              ["Username", "username"],
               ["Email", "email"],
               ["Mobile", "mobile"],
               ["Gender", "gender"],
@@ -181,9 +213,8 @@ const Profile = ({ onClose }) => {
               ["Verified", "isVerified", true],
             ].map(([label, name, readonly]) => (
               <div key={name}>
-                <label className="text-sm font-medium text-gray-600">
-                  {label}
-                </label>
+                <label className="text-sm font-medium text-gray-600">{label}</label>
+
                 {name === "gender" ? (
                   <select
                     name="gender"
@@ -194,6 +225,10 @@ const Profile = ({ onClose }) => {
                       !isEditing || readonly
                         ? "bg-gray-100 cursor-not-allowed"
                         : "bg-white"
+                    } ${
+                      requiredFields.includes(name) && !formData[name]
+                        ? "border-red-500"
+                        : ""
                     }`}
                   >
                     <option value="">Select Gender</option>
@@ -202,34 +237,34 @@ const Profile = ({ onClose }) => {
                     <option value="Other">Other</option>
                   </select>
                 ) : (
-                
-                <input
-                  type={
-                    name === "dob" || name === "joiningDate" ? "date" : "text"
-                  }
-                  name={name}
-                  readOnly={!isEditing || readonly}
-                  value={
-                    name === "joiningDate" || name === "dob"
-                      ? formData[name]
-                        ? new Date(formData[name])
-                            .toISOString()
-                            .split("T")[0]
+                  <input
+                    type={name === "dob" || name === "joiningDate" ? "date" : "text"}
+                    name={name}
+                    readOnly={!isEditing || readonly}
+                    value={
+                      name === "joiningDate" || name === "dob"
+                        ? formData[name]
+                          ? new Date(formData[name]).toISOString().split("T")[0]
+                          : ""
+                        : name === "isVerified"
+                        ? formData[name]
+                          ? "Yes"
+                          : "No"
+                        : formData[name] || ""
+                    }
+                    onChange={handleInputChange}
+                    className={`w-full px-3 py-2 mt-1 border rounded text-sm ${
+                      !isEditing || readonly
+                        ? "bg-gray-100 cursor-not-allowed"
+                        : "bg-white"
+                    } ${
+                      requiredFields.includes(name) && !formData[name]
+                        ? "border-red-500"
                         : ""
-                      : name === "isVerified"
-                      ? formData[name]
-                        ? "Yes"
-                        : "No"
-                      : formData[name] || ""
-                  }
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 mt-1 border rounded text-sm ${
-                    !isEditing || readonly
-                      ? "bg-gray-100 cursor-not-allowed"
-                      : "bg-white"
-                  }`}
-                />
-                )}</div>
+                    }`}
+                  />
+                )}
+              </div>
             ))}
           </div>
         </div>

@@ -3,6 +3,10 @@ const User = require('../models/User');
 const Enrollment = require('../models/Enrollment');
 const Exam = require('../models/Exam');
 const Assignment = require('../models/Assignment');
+const isProfileComplete = (user) => {
+  const requiredFields = ["fullName", "username", "mobile", "gender", "dob", "address"];
+  return requiredFields.every((field) => user[field] && user[field].toString().trim() !== "");
+};
 
 // GET /courses/student (student view)
 exports.getApprovedCourses = async (req, res) => {
