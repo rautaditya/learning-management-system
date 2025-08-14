@@ -12,8 +12,8 @@ const {
 const { uploadStudyMaterial } = require('../middleware/upload');
 
 router.post('/study-material', verifyToken(['admin', 'superadmin']), uploadStudyMaterial, addStudyMaterial);
-router.get('/study-materials/admin', verifyToken(['admin']), getStudyMaterialsByAdmin);
-router.get('/study-materials', verifyToken(['superadmin']), getAllStudyMaterials);
+router.get('/study-materials/admin', verifyToken(['admin', 'superadmin']), getStudyMaterialsByAdmin);
+router.get('/study-materials', verifyToken(['superadmin', 'admin']), getAllStudyMaterials);
 router.delete('/study-material/:id', verifyToken(['admin', 'superadmin']), deleteStudyMaterial);
 
 // ✅ New: Update route with file support

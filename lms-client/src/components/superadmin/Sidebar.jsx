@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   LayoutDashboard, UserCog, BookOpen, Building, FileBarChart,
-  Settings, LogOut, ShieldPlus, Users, ClipboardList, Film , UserCheck
+  Settings, LogOut, ShieldPlus, Users, ClipboardList, Film , UserCheck, FileSpreadsheet
 } from 'lucide-react';
 
 const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
@@ -30,6 +30,14 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
         { path: '/superadmin/course-category', label: 'Categories' }
       ]
     },
+    {
+          label: 'Study Material',
+          icon: <FileSpreadsheet size={20} />,
+          children: [
+            { path: '/superadmin/studymaterial/add', label: 'AddMaterial' },
+            { path: '/superadmin/studymaterial/manage', label: 'ManageMaterial' }
+          ]
+        },
     {
       label: 'Assignment',
       icon: <ClipboardList size={20} />, // Assignment icon
