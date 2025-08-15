@@ -258,6 +258,13 @@ const ManageAssignment = () => {
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+
+  const [activeView, setActiveView] = useState('cards');
+  const [submissionsData, setSubmissionsData] = useState([]);
+  const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
+  const [selectedSubmissionCourse, setSelectedSubmissionCourse] = useState('all');
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -276,6 +283,38 @@ const ManageAssignment = () => {
       setLoading(false);
     }
   };
+
+
+  const loadSubmissions = async () => {
+    try {
+      setSubmissionsLoading(true);
+      const allSubmissions = [];
+      
+      for (const assignment of assignments) {
+        try {
+          const response = await getAssignmentSubmissions(assignment._id);
+          const submissions = response.data.submissions.map(sub => ({
+            ...sub,
+            assignmentTitle: assignment.title,
+            assignmentId: assignment._id,
+            courseTitle: assignment.course?.title || 'No Course'
+          }));
+          allSubmissions.push(...submissions);
+        } catch (err) {
+          console.error(`Failed to fetch submissions for assignment ${assignment._id}:`, err);
+        }
+      }
+      
+      setSubmissionsData(allSubmissions);
+      setTotalSubmissions(allSubmissions.length);
+    } catch (err) {
+      console.error('Error loading submissions:', err);
+      setMessage('Failed to load submissions');
+    } finally {
+      setSubmissionsLoading(false);
+    }
+  };
+
 
   const startEditing = (assignment) => {
     setEditingId(assignment._id);
@@ -351,8 +390,18 @@ const ManageAssignment = () => {
     return matchesSearch && matchesCourse;
   });
 
+
   // Get unique courses for filter dropdown
   const uniqueCourses = [...new Set(assignments.map(a => a.course?.title).filter(Boolean))];
+
+  const filteredSubmissions = selectedSubmissionCourse === 'all' 
+    ? submissionsData 
+    : submissionsData.filter(sub => sub.courseTitle === selectedSubmissionCourse);
+
+  // const uniqueCourses = [
+  //   ...new Set(assignments.map((a) => a.course?.title).filter(Boolean)),
+  // ];
+
 
   // Check if assignment is overdue
   const isOverdue = (dueDate) => {
@@ -416,6 +465,7 @@ const ManageAssignment = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 />
               </div>
+
               <select
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
@@ -426,6 +476,48 @@ const ManageAssignment = () => {
                   <option key={course} value={course}>{course}</option>
                 ))}
               </select>
+
+              {activeView === 'cards' ? (
+                <select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="all">All Courses</option>
+                  {uniqueCourses.map(course => (
+                    <option key={course} value={course}>{course}</option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  value={selectedSubmissionCourse}
+                  onChange={(e) => setSelectedSubmissionCourse(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="all">All Courses</option>
+                  {uniqueCourses.map(course => (
+                    <option key={course} value={course}>{course}</option>
+                  ))}
+                </select>
+              )}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setActiveView('cards')}
+                  className={`px-4 py-3 rounded-xl transition-all ${activeView === 'cards' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  Assignments
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveView('submissions');
+                    loadSubmissions();
+                  }}
+                  className={`px-4 py-3 rounded-xl transition-all ${activeView === 'submissions' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  Submissions
+                </button>
+              </div>
+
             </div>
           </div>
 
@@ -474,6 +566,27 @@ const ManageAssignment = () => {
                 </div>
               </div>
             </div>
+
+            <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-800">
+                    {submissionsLoading ? (
+                      <span className="inline-block h-6 w-8 bg-gray-200 rounded animate-pulse"></span>
+                    ) : (
+                      activeView === 'cards' ? totalSubmissions : filteredSubmissions.length
+                    )}
+                  </p>
+                  <p className="text-sm text-gray-600">Submissions</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -649,6 +762,7 @@ const ManageAssignment = () => {
           })}
         </div>
 
+
         {/* Empty State */}
         {filteredAssignments.length === 0 && (
           <div className="text-center py-16">
@@ -665,8 +779,138 @@ const ManageAssignment = () => {
             >
               Create Assignment
             </button>
+
+            {/* Empty State */}
+            {filteredAssignments.length === 0 && (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No assignments found</h3>
+                <p className="text-gray-500 mb-6">Get started by creating your first assignment.</p>
+                <button
+                  onClick={() => navigate('/admin/addassignment')}
+                  className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 font-semibold"
+                >
+                  Create Assignment
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        )} : (
+          /* Submissions Table View */
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  All Submissions ({filteredSubmissions.length})
+                </h2>
+                <p className="text-gray-600">View and manage all assignment submissions</p>
+              </div>
+              <select
+                value={selectedSubmissionCourse}
+                onChange={(e) => setSelectedSubmissionCourse(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white text-sm"
+              >
+                <option value="all">All Courses</option>
+                {uniqueCourses.map(course => (
+                  <option key={course} value={course}>{course}</option>
+                ))}
+              </select>
+            </div>
+            
+            {submissionsLoading ? (
+              <div className="p-8 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : filteredSubmissions.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Assignment
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Course
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Student
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Email
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Submitted At
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredSubmissions.map((submission) => (
+                      <tr key={submission._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {submission.assignmentTitle}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {submission.courseTitle}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {submission.studentName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {submission.studentEmail}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(submission.submittedAt).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            submission.status === 'submitted' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {submission.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {submission.fileUrl && (
+                            <a 
+                              href={`${apiBaseUrl}${submission.fileUrl}`}
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-indigo-600 hover:text-indigo-900"
+                            >
+                              Download
+                            </a>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-8 text-center">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No submissions found</h3>
+                <p className="text-gray-500 mb-6">Students haven't submitted any assignments yet.</p>
+              </div>
+            )}
+
+          </div>
+        
       </div>
 
       {/* Delete Confirmation Modal */}
