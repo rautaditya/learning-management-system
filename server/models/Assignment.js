@@ -31,7 +31,16 @@ const assignmentSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    submissions: [
+  {
+    student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    fileUrl: { type: String, required: true },
+    submittedAt: { type: Date, default: Date.now },
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+    status: { type: String, default: 'submitted' } // ← add this
+  }
+]
 });
 
 module.exports = mongoose.model('Assignment', assignmentSchema);

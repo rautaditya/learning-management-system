@@ -222,6 +222,20 @@ const certificateTemplateStorage = multer.diskStorage({
     cb(null, `${Date.now()}-${baseName}${ext}`);
   }
 });
+// ✅ Assignment submissions storage
+const assignmentSubmissionStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadPath = 'uploads/assignments/';
+    ensureDirExists(uploadPath);
+    cb(null, uploadPath);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
+    cb(null, `${Date.now()}-${baseName}${ext}`);
+  }
+});
+
 
 // ✅ Main upload middleware
 const upload = multer({ storage: defaultStorage, fileFilter });
@@ -237,5 +251,7 @@ module.exports = {
   ]),
   uploadStudyMaterial: multer({ storage: studyMaterialStorage, fileFilter }).single('file'),
   uploadGeneric: upload,
-  uploadCertificateTemplate: multer({ storage: certificateTemplateStorage, fileFilter }).single('image') // 👈 for certificate templates
+  uploadCertificateTemplate: multer({ storage: certificateTemplateStorage, fileFilter }).single('image'), // 👈 for certificate templates
+  uploadAssignmentSubmission: multer({ storage: assignmentSubmissionStorage,limits: { fileSize: 25 * 1024 * 1024 } }).single('file')
+
 };

@@ -1,66 +1,28 @@
-// import React, { useEffect, useState } from 'react';
-// import { getMyAssignments } from '../../api/student';
-
-// const Assignments = () => {
-//   const [assignments, setAssignments] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState('');
-
-//   useEffect(() => {
-//     const fetchAssignments = async () => {
-//       try {
-//         const data = await getMyAssignments();
-//         setAssignments(data);
-//       } catch (err) {
-//         console.error('Error fetching assignments:', err);
-//         setError('Failed to fetch assignments');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchAssignments();
-//   }, []);
-
-//   if (loading) return <div>Loading assignments...</div>;
-//   if (error) return <div className="text-red-500">{error}</div>;
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-2xl font-bold mb-4">My Assignments</h2>
-//       {assignments.length === 0 ? (
-//         <div>No assignments found for your enrolled courses.</div>
-//       ) : (
-//         <ul className="space-y-4">
-//           {assignments.map((assignment) => (
-//             <li key={assignment._id} className="border p-4 rounded shadow">
-//               <h3 className="font-semibold text-lg">{assignment.title}</h3>
-//               <p><strong>Course:</strong> {assignment.course?.title}</p>
-//               <p><strong>Video:</strong> {assignment.video ? assignment.video.title : 'Not linked to a video'}</p>
-//               <p><strong>Description:</strong> {assignment.description || 'No description provided'}</p>
-//               <p><strong>File URL:</strong> {assignment.fileUrl ? (
-//                 <a href={assignment.fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Download</a>
-//               ) : 'No file attached'}</p>
-//               <p><strong>Due Date:</strong> {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</p>
-//               <p><strong>Created By:</strong> {assignment.createdBy?.fullName}</p>
-//               <p><strong>Created At:</strong> {new Date(assignment.createdAt).toLocaleString()}</p>
-//             </li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Assignments;
 import React, { useEffect, useState } from 'react';
-import { BookOpen, Calendar, Download, FileText, Clock, User, GraduationCap, AlertCircle, Video } from 'lucide-react';
-import { getMyAssignments } from '../../api/student';
+import { 
+  BookOpen, 
+  Calendar, 
+  Download, 
+  FileText, 
+  Clock, 
+  User, 
+  GraduationCap, 
+  AlertCircle, 
+  Video, 
+  Upload,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
+import { getMyAssignments, submitStudentAssignment } from '../../api/student';
 
 const Assignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [submissionFile, setSubmissionFile] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState('');
 
   useEffect(() => {
     const fetchAssignments = async () => {
@@ -91,6 +53,54 @@ const Assignments = () => {
     if (diffDays <= 7) return { status: 'upcoming', color: 'text-yellow-600 bg-yellow-50' };
     return { status: 'normal', color: 'text-green-600 bg-green-50' };
   };
+
+  const handleFileChange = (e) => {
+    setSubmissionFile(e.target.files[0]);
+    setSubmissionError('');
+  };
+
+  const handleSubmitAssignment = async () => {
+  if (!submissionFile) {
+    setSubmissionError('Please select a file to upload');
+    return;
+  }
+
+  if (!selectedAssignment) {
+    setSubmissionError('No assignment selected');
+    return;
+  }
+
+  setIsSubmitting(true);
+  setSubmissionError('');
+
+  try {
+    const formData = new FormData();
+    formData.append('file', submissionFile);
+
+    // ✅ Use the actual student ID, not the token
+    const studentId = localStorage.getItem('user._id');
+
+    const updatedAssignment = await submitStudentAssignment(
+      selectedAssignment._id,
+      studentId,
+      formData
+    );
+
+    setAssignments(assignments.map(assignment =>
+      assignment._id === updatedAssignment._id ? updatedAssignment : assignment
+    ));
+
+    setSelectedAssignment(null);
+    setSubmissionFile(null);
+  } catch (err) {
+    console.error('Error submitting assignment:', err);
+    setSubmissionError(err.response?.data?.error || 'Failed to submit assignment');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -166,6 +176,7 @@ const Assignments = () => {
           <div className="space-y-6">
             {assignments.map((assignment) => {
               const dueDateStatus = getDueDateStatus(assignment.dueDate);
+              const hasSubmitted = assignment.submissions?.length > 0;
               
               return (
                 <div key={assignment._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
@@ -219,6 +230,30 @@ const Assignments = () => {
                       </div>
                     )}
 
+                    {/* Submission Status */}
+                    {hasSubmitted && (
+                      <div className="mb-4 p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Submitted
+                        </h4>
+                        <p className="text-green-700 text-sm">
+                          You submitted on {new Date(assignment.submissions[0].submittedAt).toLocaleString()}
+                        </p>
+                        {assignment.submissions[0].fileUrl && (
+                          <a 
+                            href={assignment.submissions[0].fileUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-green-600 hover:underline mt-2"
+                          >
+                            <Download className="h-3 w-3" />
+                            View Submission
+                          </a>
+                        )}
+                      </div>
+                    )}
+
                     {/* Footer Info */}
                     <div className="grid md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                       <div className="flex items-center gap-2">
@@ -262,6 +297,19 @@ const Assignments = () => {
                         </a>
                       </div>
                     )}
+
+                    {/* Submission Button */}
+                    {(!hasSubmitted || assignment.allowResubmission) && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <button
+                          onClick={() => setSelectedAssignment(assignment)}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                        >
+                          <Upload className="h-4 w-4" />
+                          {hasSubmitted ? 'Resubmit Assignment' : 'Submit Assignment'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -269,6 +317,102 @@ const Assignments = () => {
           </div>
         )}
       </div>
+
+      {/* Submission Modal */}
+      {selectedAssignment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-semibold">Submit Assignment</h3>
+              <button 
+                onClick={() => {
+                  setSelectedAssignment(null);
+                  setSubmissionFile(null);
+                  setSubmissionError('');
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <XCircle className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="mb-2"><strong>Assignment:</strong> {selectedAssignment.title}</p>
+              <p><strong>Course:</strong> {selectedAssignment.course?.title}</p>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Upload your submission
+              </label>
+              <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col w-full h-32 border-2 border-dashed rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
+                  <div className="flex flex-col items-center justify-center pt-7">
+                    <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-600">
+                      {submissionFile ? (
+                        <span className="font-medium text-indigo-600">{submissionFile.name}</span>
+                      ) : (
+                        <>
+                          <span className="font-medium">Click to upload</span> or drag and drop
+                        </>
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">PDF, DOCX, PPTX (Max 10MB)</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    onChange={handleFileChange}
+                    className="opacity-0 absolute" 
+                    accept=".pdf,.doc,.docx,.ppt,.pptx"
+                  />
+                </label>
+              </div>
+            </div>
+
+            {submissionError && (
+              <div className="text-red-500 text-sm mb-4 flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                {submissionError}
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setSelectedAssignment(null);
+                  setSubmissionFile(null);
+                  setSubmissionError('');
+                }}
+                className="px-4 py-2 text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitAssignment}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    Submit
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
