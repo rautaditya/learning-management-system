@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { addCourse, getAdminCourses, updateCourse, deleteCourse ,createExam,getExam,updateExam,deleteExam,getAdminProfile,getAllEnrollments,updateAdminProfile,getCourseCompletionReport,getExamCompletionReport} = require('../controllers/adminController');
+const { addCourse, getAdminCourses, updateCourse, deleteCourse ,createExam,getExam,updateExam,deleteExam,getAdminProfile,getAllEnrollments,updateAdminProfile,getCourseCompletionReport,getExamCompletionReport,getAssignmentSubmissions} = require('../controllers/adminController');
 const { verifyToken } = require('../middleware/authMiddleware');
 const { uploadSingleImage, uploadAdminProfileImages, uploadSingleVideo, uploadGeneric } = require('../middleware/upload'); // Fixed importort
 
@@ -33,6 +33,7 @@ router.get('/enrolledcourses', verifyToken(['admin']), getAllEnrollments);
 router.put('/adminprofile',verifyToken(['admin']),uploadAdminProfileImages,updateAdminProfile);
 router.get('/completion/:courseId',verifyToken(['admin']), getCourseCompletionReport);
 router.get('/exam-completion/:examId',verifyToken(['admin']), getExamCompletionReport);
+router.get('/assignment/:assignmentId',verifyToken(['admin']), getAssignmentSubmissions);
 
 
 
