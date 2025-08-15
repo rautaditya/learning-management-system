@@ -18,14 +18,19 @@ import {
   BarChart2
 } from 'lucide-react';
 
+// Import the navbar and footer components
+
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   
   // Animate sections as they come into view
   const [animateSections, setAnimateSections] = useState({
     hero: false,
     features: false,
+    categories: false,
+    courses: false,
     testimonials: false,
     stats: false,
     cta: false
@@ -59,30 +64,120 @@ export default function LandingPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [animateSections]);
   
+  // Featured courses data
+  const courses = [
+    {
+      id: 1,
+      title: 'Web Development Masterclass',
+      category: 'Development',
+      instructor: 'Sarah Johnson',
+      rating: 4.9,
+      students: '2,345',
+      level: 'All Levels',
+      image: 'web-dev',
+      popular: true
+    },
+    {
+      id: 2,
+      title: 'Data Science Fundamentals',
+      category: 'Data Science',
+      instructor: 'Michael Chen',
+      rating: 4.8,
+      students: '1,987',
+      level: 'Beginner',
+      image: 'data-science',
+      popular: true
+    },
+    {
+      id: 3,
+      title: 'UX/UI Design Principles',
+      category: 'Design',
+      instructor: 'Alex Rivera',
+      rating: 4.7,
+      students: '1,456',
+      level: 'Intermediate',
+      image: 'ux-design',
+      popular: false
+    },
+    {
+      id: 4,
+      title: 'Business Analytics 101',
+      category: 'Business',
+      instructor: 'Priya Sharma',
+      rating: 4.9,
+      students: '2,145',
+      level: 'Beginner',
+      image: 'business',
+      popular: true
+    },
+    {
+      id: 5,
+      title: 'Machine Learning Applications',
+      category: 'Data Science',
+      instructor: 'David Wilson',
+      rating: 4.8,
+      students: '1,652',
+      level: 'Advanced',
+      image: 'machine-learning',
+      popular: false
+    },
+    {
+      id: 6,
+      title: 'Mobile App Development',
+      category: 'Development',
+      instructor: 'Lisa Chang',
+      rating: 4.7,
+      students: '1,289',
+      level: 'Intermediate',
+      image: 'mobile-dev',
+      popular: false
+    }
+  ];
+  
+  // Course categories
+  const categories = [
+    { id: 'All', name: 'All Categories', count: courses.length },
+    { id: 'Development', name: 'Development', icon: <Code size={18} />, count: courses.filter(c => c.category === 'Development').length },
+    { id: 'Design', name: 'Design', icon: <PenTool size={18} />, count: courses.filter(c => c.category === 'Design').length },
+    { id: 'Business', name: 'Business', icon: <Briefcase size={18} />, count: courses.filter(c => c.category === 'Business').length },
+    { id: 'Data Science', name: 'Data Science', icon: <Database size={18} />, count: courses.filter(c => c.category === 'Data Science').length },
+    { id: 'Marketing', name: 'Marketing', icon: <TrendingUp size={18} />, count: 12 },
+    { id: 'IT', name: 'IT & Software', icon: <Monitor size={18} />, count: 18 },
+    { id: 'Analytics', name: 'Analytics', icon: <BarChart2 size={18} />, count: 9 }
+  ];
+  
   // Testimonials data
   const testimonials = [
     {
       id: 1,
       content: "Vivaaks LMS completely transformed my learning experience. The interactive courses and supportive community helped me land my dream job in web development!",
-      name: "siddhesh ",
+      name: "Emily Rodriguez",
       title: "Frontend Developer",
       avatar: "emily"
     },
     {
       id: 2,
       content: "As someone switching careers, I needed structured learning that fit my schedule. The courses here are comprehensive and the instructors are top-notch professionals.",
-      name: "sakshi",
+      name: "Marcus Johnson",
       title: "Data Scientist",
       avatar: "marcus"
     },
     {
       id: 3,
       content: "The certification programs are recognized industry-wide. I've completed three courses and each one significantly advanced my career and skillset.",
-      name: "Aksahy ",
+      name: "Sophia Chen",
       title: "UX Designer",
       avatar: "sophia"
     }
   ];
+  
+  // Filter courses based on active category and search term
+  const filteredCourses = courses.filter(course => {
+    const matchesCategory = activeCategory === 'All' || course.category === activeCategory;
+    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          course.instructor.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
   
   // Helper function to generate placeholder images
   const getPlaceholderImg = (name, width = 400, height = 250) => {
@@ -268,6 +363,125 @@ export default function LandingPage() {
         </div>
       </section>
       
+      {/* Categories Section */}
+      <section 
+        id="categories" 
+        className={`py-16 md:py-24 bg-gray-50 transition-opacity duration-1000 ${
+          animateSections.categories ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">Explore Course Categories</h2>
+            <p className="mt-4 text-xl text-gray-600">Find the perfect course for your learning goals</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
+            {categories.map((category, index) => (
+              <button
+                key={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className={`p-5 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
+                  activeCategory === category.id
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
+                    : 'bg-white hover:bg-gray-100 text-gray-800 shadow-sm'
+                } ${
+                  animateSections.categories ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}
+                style={{ transitionDelay: `${index * 75}ms` }}
+              >
+                {category.icon && <div className="mb-3">{category.icon}</div>}
+                <h3 className="font-medium text-center">{category.name}</h3>
+                <p className={`text-sm mt-1 ${activeCategory === category.id ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {category.count} courses
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Featured Courses Section */}
+      <section 
+        id="courses" 
+        className={`py-16 md:py-24 bg-white transition-opacity duration-1000 ${
+          animateSections.courses ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900">Featured Courses</h2>
+              <p className="mt-4 text-xl text-gray-600">
+                {activeCategory === 'All' ? 'Popular courses across all categories' : `Top ${activeCategory} courses`}
+              </p>
+            </div>
+            <a href="#" className="mt-4 md:mt-0 inline-flex items-center text-blue-600 font-medium hover:text-blue-800">
+              View All Courses
+              <ChevronRight size={18} className="ml-1" />
+            </a>
+          </div>
+          
+          {filteredCourses.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredCourses.map((course, index) => (
+                <div 
+                  key={course.id}
+                  className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden transform hover:-translate-y-1 ${
+                    animateSections.courses ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <div className="relative">
+                    <img 
+                      src={getPlaceholderImg(course.image)} 
+                      alt={course.title} 
+                      className="w-full h-48 object-cover"
+                    />
+                    {course.popular && (
+                      <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs py-1 px-2 rounded-full font-medium">
+                        Popular
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md">
+                      <BookOpen size={16} className="text-blue-600" />
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-medium text-indigo-600 bg-indigo-50 py-1 px-2 rounded-full">
+                        {course.category}
+                      </span>
+                      <div className="flex items-center">
+                        <Star size={16} className="text-yellow-400" />
+                        <span className="ml-1 text-sm font-medium text-gray-800">{course.rating}</span>
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{course.title}</h3>
+                    <p className="text-sm text-gray-600 mb-4">Instructor: {course.instructor}</p>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <span className="text-sm text-gray-500">
+                        {course.students} students
+                      </span>
+                      <span className="text-sm font-medium text-blue-600">
+                        {course.level}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No courses found. Try a different search term or category.</p>
+            </div>
+          )}
+        </div>
+      </section>
+      
       {/* Testimonials Section */}
       <section 
         id="testimonials" 
@@ -295,7 +509,7 @@ export default function LandingPage() {
                 <div className="flex items-center">
                   <div className="h-12 w-12 rounded-full overflow-hidden mr-4">
                     <img 
-                      src={`https://i.pravatar.cc/150?img=${testimonial.id}`}
+                      src={getPlaceholderImg(testimonial.avatar, 100, 100)} 
                       alt={testimonial.name} 
                       className="h-full w-full object-cover"
                     />
@@ -347,6 +561,9 @@ export default function LandingPage() {
       >
         <ChevronRight size={24} className="transform rotate-270" />
       </button>
+      
+      {/* Custom animations */}
+     
     </div>
   );
 }

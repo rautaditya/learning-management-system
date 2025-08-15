@@ -50,10 +50,10 @@ export default function Footer() {
   };
   
   const stats = [
-    { icon: BookOpen, label: 'Courses', value: '200+' },
-    { icon: Award, label: 'Certifications', value: '100+' },
-    { icon: Users, label: 'Students', value: '500+' },
-    { icon: Clock, label: 'Hours', value: '2000+' }
+    { icon: <BookOpen size={24} />, value: '200+', label: 'Courses' },
+    { icon: <Users size={24} />, value: '15,000+', label: 'Students' },
+    { icon: <Award size={24} />, value: '99%', label: 'Success Rate' },
+    { icon: <Clock size={24} />, value: '24/7', label: 'Support' }
   ];
   
   const resources = [
@@ -121,15 +121,15 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
                 <Mail size={16} className="mr-3" />
-                <span>vivaakshr@gmail.com</span>
+                <span>contact@Vivaaks.edu</span>
               </div>
               <div className="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
                 <Phone size={16} className="mr-3" />
-                <span>+919901328510</span>
+                <span>+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
-                <MapPin size={50} className="mr-3" />
-                <span>NO 512/10 OUTER RING ROAD, NEXT TO MORE MEGA STORE, MAHADEVAPURA BANGALORE 560048</span>
+                <MapPin size={16} className="mr-3" />
+                <span>123 Learning Ave, Education City</span>
               </div>
             </div>
           </div>
