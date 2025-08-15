@@ -188,12 +188,3 @@ export const getExamCompletionReport = async (examId) => {
   });
   return res.data;
 };
-
-// get submissions
-export const getAssignmentSubmissions = async (assignmentId) => {
-  const token = localStorage.getItem("token");
-  const res = await axiosInstance.get(`/admin/assignment/${assignmentId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
-};

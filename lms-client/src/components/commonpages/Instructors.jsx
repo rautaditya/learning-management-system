@@ -97,139 +97,115 @@ const AddInstructor = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto mt-12 p-5 border border-gray-300 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">
-                {isEditing ? 'Edit Instructor' : 'Add Instructor'}
-            </h2>
+        <div style={{ maxWidth: '900px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '10px' }}>
+            <h2>{isEditing ? 'Edit Instructor' : 'Add Instructor'}</h2>
 
             {message && (
-                <div className={`p-3 mb-3 rounded ${
-                    message.type === 'success' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                }`}>
+                <div style={{
+                    padding: '10px',
+                    background: message.type === 'success' ? '#d4edda' : '#f8d7da',
+                    color: message.type === 'success' ? '#155724' : '#721c24',
+                    marginBottom: '10px',
+                    borderRadius: '5px'
+                }}>
                     {message.text}
                 </div>
             )}
 
             <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Full Name
-                    </label>
+                <div style={{ marginBottom: '10px' }}>
+                    <label>Full Name</label>
                     <input
                         type="text"
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ width: '100%', padding: '8px', marginTop: '5px' }}
                     />
                 </div>
 
-                <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                    </label>
+                <div style={{ marginBottom: '10px' }}>
+                    <label>Email</label>
                     <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ width: '100%', padding: '8px', marginTop: '5px' }}
                     />
                 </div>
 
-                <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Department
-                    </label>
+                <div style={{ marginBottom: '10px' }}>
+                    <label>Department</label>
                     <input
                         type="text"
                         name="department"
                         value={formData.department}
                         onChange={handleChange}
                         required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ width: '100%', padding: '8px', marginTop: '5px' }}
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className={`w-full py-3 px-4 text-white font-medium rounded-md transition-colors duration-200 ${
-                        loading 
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : isEditing 
-                                ? 'bg-green-600 hover:bg-green-700' 
-                                : 'bg-blue-600 hover:bg-blue-700'
-                    }`}
+                    style={{
+                        width: '100%',
+                        padding: '10px',
+                        background: isEditing ? '#28a745' : '#007bff',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: 'pointer'
+                    }}
                 >
-                    {loading 
-                        ? (isEditing ? 'Updating...' : 'Adding...') 
-                        : (isEditing ? 'Update Instructor' : 'Add Instructor')
-                    }
+                    {loading ? (isEditing ? 'Updating...' : 'Adding...') : (isEditing ? 'Update Instructor' : 'Add Instructor')}
                 </button>
             </form>
 
             {/* Instructor List */}
-            <div className="mt-8">
-                <h3 className="text-xl font-semibold mb-4">Instructor List</h3>
+            <div style={{ marginTop: '30px' }}>
+                <h3>Instructor List</h3>
                 {loadingInstructors ? (
-                    <p className="text-gray-600">Loading instructors...</p>
+                    <p>Loading instructors...</p>
                 ) : instructors.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full border-collapse border border-gray-300">
-                            <thead>
-                                <tr className="bg-gray-50">
-                                    <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">
-                                        Full Name
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">
-                                        Email
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">
-                                        Department
-                                    </th>
-                                    <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">
-                                        Actions
-                                    </th>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                        <thead>
+                            <tr>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Full Name</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Department</th>
+                                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {instructors.map((inst) => (
+                                <tr key={inst._id}>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{inst.fullName}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{inst.email}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{inst.department}</td>
+                                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                                        <button
+                                            onClick={() => handleEdit(inst)}
+                                            style={{ marginRight: '5px', padding: '5px 10px', background: '#ffc107', border: 'none', cursor: 'pointer' }}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(inst._id)}
+                                            style={{ padding: '5px 10px', background: '#dc3545', color: '#fff', border: 'none', cursor: 'pointer' }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {instructors.map((inst) => (
-                                    <tr key={inst._id} className="hover:bg-gray-50">
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {inst.fullName}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {inst.email}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            {inst.department}
-                                        </td>
-                                        <td className="border border-gray-300 px-4 py-2">
-                                            <button
-                                                onClick={() => handleEdit(inst)}
-                                                className="mr-2 px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded transition-colors duration-200"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(inst._id)}
-                                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors duration-200"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                            ))}
+                        </tbody>
+                    </table>
                 ) : (
-                    <p className="text-gray-600">No instructors found.</p>
+                    <p>No instructors found.</p>
                 )}
             </div>
         </div>

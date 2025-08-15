@@ -1,9 +1,248 @@
+// import React, { useEffect, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import {
+//   getAllAssignments,
+//   updateAssignment,
+//   deleteAssignment,
+// } from '../../api/admin';
+
+// const ManageAssignment = () => {
+// const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+//   const [assignments, setAssignments] = useState([]);
+//   const [editingId, setEditingId] = useState(null);
+//   const [editForm, setEditForm] = useState({
+//     title: '',
+//     description: '',
+//     dueDate: '',
+//     file: null,
+//     existingFileUrl: '',
+//   });
+//   const [message, setMessage] = useState('');
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     loadAssignments();
+//   }, []);
+
+//   const loadAssignments = async () => {
+//     try {
+//       const data = await getAllAssignments();
+//       setAssignments(data || []);
+//     } catch (err) {
+//       console.error('Error loading assignments:', err);
+//       setMessage('Failed to load assignments');
+//     }
+//   };
+
+//   const startEditing = (assignment) => {
+//     setEditingId(assignment._id);
+//     setEditForm({
+//       title: assignment.title,
+//       description: assignment.description,
+//       dueDate: assignment.dueDate?.split('T')[0] || '',
+//       file: null,
+//       existingFileUrl: assignment.fileUrl || '',
+//     });
+//   };
+
+//   const handleEditChange = (e) => {
+//     const { name, value, files } = e.target;
+//     if (name === 'file') {
+//       setEditForm({ ...editForm, file: files[0] });
+//     } else {
+//       setEditForm({ ...editForm, [name]: value });
+//     }
+//   };
+
+//   const saveEdit = async (id) => {
+//     try {
+//       const formData = new FormData();
+//       formData.append('title', editForm.title);
+//       formData.append('description', editForm.description);
+//       formData.append('dueDate', editForm.dueDate);
+//       if (editForm.file) {
+//         formData.append('file', editForm.file);
+//       }
+
+//       await updateAssignment(id, formData);
+//       setEditingId(null);
+//       setMessage('Assignment updated successfully');
+//       loadAssignments();
+//     } catch (err) {
+//       console.error('Update error:', err);
+//       setMessage('Failed to update assignment');
+//     }
+//   };
+
+//   const handleDelete = async (id) => {
+//     if (!window.confirm('Are you sure you want to delete this assignment?')) return;
+//     try {
+//       await deleteAssignment(id);
+//       setMessage('Assignment deleted successfully');
+//       loadAssignments();
+//     } catch (err) {
+//       console.error('Delete error:', err);
+//       setMessage('Failed to delete assignment');
+//     }
+//   };
+
+//   return (
+//     <div className="p-6 max-w-7xl mx-auto">
+//       <div className="flex justify-between items-center mb-6">
+//         <h2 className="text-3xl font-bold text-gray-800">Manage Assignments</h2>
+//         <button
+//           onClick={() => navigate('/admin/addassignment')}
+//           className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow hover:from-blue-600 hover:to-indigo-700 transition-all"
+//         >
+//           Click to Add Assignments
+//         </button>
+//       </div>
+
+//       {message && <p className="mb-4 text-red-600 font-semibold">{message}</p>}
+
+//       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+//         {assignments.map((assignment) => {
+//           // Use apiBaseUrl from environment
+//           const fullFileUrl = assignment.fileUrl
+//             ? `${apiBaseUrl}${assignment.fileUrl}`
+//             : '';
+
+//           return (
+//             <div
+//               key={assignment._id}
+//               className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border ring-1 ring-gray-200"
+//             >
+//               <h3 className="text-xl font-bold text-indigo-700 mb-2">
+//                 {assignment.course?.title || 'Untitled Course'}
+//               </h3>
+
+//               {editingId === assignment._id ? (
+//                 <>
+//                   <input
+//                     type="text"
+//                     name="title"
+//                     value={editForm.title}
+//                     onChange={handleEditChange}
+//                     className="w-full border p-2 mb-3 rounded focus:ring focus:ring-indigo-300"
+//                     placeholder="Title"
+//                   />
+//                   <textarea
+//                     name="description"
+//                     value={editForm.description}
+//                     onChange={handleEditChange}
+//                     className="w-full border p-2 mb-3 rounded focus:ring focus:ring-indigo-300"
+//                     placeholder="Description"
+//                   />
+//                   <input
+//                     type="date"
+//                     name="dueDate"
+//                     value={editForm.dueDate}
+//                     onChange={handleEditChange}
+//                     className="w-full border p-2 mb-3 rounded focus:ring focus:ring-indigo-300"
+//                   />
+//                   {editForm.existingFileUrl && (
+//                     <p className="mb-2 text-sm text-gray-600">
+//                       <strong>Current File:</strong>{' '}
+//                       <a
+//                         href={`${apiBaseUrl}${editForm.existingFileUrl}`}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="text-blue-600 underline"
+//                       >
+//                         View File
+//                       </a>
+//                     </p>
+//                   )}
+//                   <input
+//                     type="file"
+//                     name="file"
+//                     accept=".pdf,.doc,.docx,.txt"
+//                     onChange={handleEditChange}
+//                     className="mb-4"
+//                   />
+//                 </>
+//               ) : (
+//                 <>
+//                   <p className="text-gray-800"><strong>Title:</strong> {assignment.title}</p>
+//                   <p className="text-gray-700 mt-1"><strong>Description:</strong> {assignment.description}</p>
+//                   <p className="text-sm mt-2 text-gray-500">
+//                     <strong>Due:</strong>{' '}
+//                     <span className="text-red-500">
+//                       {new Date(assignment.dueDate).toLocaleDateString()}
+//                     </span>
+//                   </p>
+//                   {assignment.fileUrl ? (
+//                     <p className="mt-3 text-sm text-gray-600">
+//                       <strong>File:</strong>{' '}
+//                       <a
+//                         href={fullFileUrl}
+//                         target="_blank"
+//                         rel="noopener noreferrer"
+//                         className="text-blue-600 underline"
+//                       >
+//                         View File
+//                       </a>
+//                     </p>
+//                   ) : (
+//                     <p className="mt-3 text-sm italic text-gray-400">No file uploaded</p>
+//                   )}
+//                 </>
+//               )}
+
+//               <div className="mt-5 flex gap-2">
+//                 {editingId === assignment._id ? (
+//                   <>
+//                     <button
+//                       onClick={() => saveEdit(assignment._id)}
+//                       className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 rounded"
+//                     >
+//                       Save
+//                     </button>
+//                     <button
+//                       onClick={() => setEditingId(null)}
+//                       className="flex-1 bg-gray-400 hover:bg-gray-500 text-white py-1.5 rounded"
+//                     >
+//                       Cancel
+//                     </button>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <button
+//                       onClick={() => startEditing(assignment)}
+//                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded"
+//                     >
+//                       Edit
+//                     </button>
+//                     <button
+//                       onClick={() => handleDelete(assignment._id)}
+//                       className="flex-1 bg-red-600 hover:bg-red-700 text-white py-1.5 rounded"
+//                     >
+//                       Delete
+//                     </button>
+//                   </>
+//                 )}
+//               </div>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ManageAssignment;
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllAssignments, updateAssignment, deleteAssignment, getAssignmentSubmissions } from '../../api/admin';
+import {
+  getAllAssignments,
+  updateAssignment,
+  deleteAssignment,
+} from '../../api/admin';
 
 const ManageAssignment = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
   const [assignments, setAssignments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({
@@ -19,10 +258,6 @@ const ManageAssignment = () => {
   const [selectedCourse, setSelectedCourse] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [activeView, setActiveView] = useState('cards');
-  const [submissionsData, setSubmissionsData] = useState([]);
-  const [submissionsLoading, setSubmissionsLoading] = useState(false);
-  const [totalSubmissions, setTotalSubmissions] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,47 +269,11 @@ const ManageAssignment = () => {
       setLoading(true);
       const data = await getAllAssignments();
       setAssignments(data || []);
-      
-      // Calculate initial total submissions
-      const initialTotal = data.reduce((sum, assignment) => {
-        return sum + (assignment.submissions?.length || 0);
-      }, 0);
-      setTotalSubmissions(initialTotal);
     } catch (err) {
       console.error('Error loading assignments:', err);
       setMessage('Failed to load assignments');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadSubmissions = async () => {
-    try {
-      setSubmissionsLoading(true);
-      const allSubmissions = [];
-      
-      for (const assignment of assignments) {
-        try {
-          const response = await getAssignmentSubmissions(assignment._id);
-          const submissions = response.data.submissions.map(sub => ({
-            ...sub,
-            assignmentTitle: assignment.title,
-            assignmentId: assignment._id,
-            courseTitle: assignment.course?.title || 'No Course'
-          }));
-          allSubmissions.push(...submissions);
-        } catch (err) {
-          console.error(`Failed to fetch submissions for assignment ${assignment._id}:`, err);
-        }
-      }
-      
-      setSubmissionsData(allSubmissions);
-      setTotalSubmissions(allSubmissions.length); // Update total count
-    } catch (err) {
-      console.error('Error loading submissions:', err);
-      setMessage('Failed to load submissions');
-    } finally {
-      setSubmissionsLoading(false);
     }
   };
 
@@ -91,8 +290,11 @@ const ManageAssignment = () => {
 
   const handleEditChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'file') setEditForm({ ...editForm, file: files[0] });
-    else setEditForm({ ...editForm, [name]: value });
+    if (name === 'file') {
+      setEditForm({ ...editForm, file: files[0] });
+    } else {
+      setEditForm({ ...editForm, [name]: value });
+    }
   };
 
   const saveEdit = async (id) => {
@@ -101,12 +303,16 @@ const ManageAssignment = () => {
       formData.append('title', editForm.title);
       formData.append('description', editForm.description);
       formData.append('dueDate', editForm.dueDate);
-      if (editForm.file) formData.append('file', editForm.file);
+      if (editForm.file) {
+        formData.append('file', editForm.file);
+      }
 
       await updateAssignment(id, formData);
       setEditingId(null);
       setMessage('Assignment updated successfully! ✅');
       loadAssignments();
+      
+      // Auto-hide success message
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error('Update error:', err);
@@ -126,6 +332,8 @@ const ManageAssignment = () => {
       loadAssignments();
       setShowDeleteModal(false);
       setDeleteId(null);
+      
+      // Auto-hide success message
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error('Delete error:', err);
@@ -134,22 +342,28 @@ const ManageAssignment = () => {
     }
   };
 
-  const filteredAssignments = assignments.filter((assignment) => {
-    const matchesSearch =
-      assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      assignment.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCourse =
-      selectedCourse === 'all' || assignment.course?.title === selectedCourse;
+  // Filter assignments based on search and course selection
+  const filteredAssignments = assignments.filter(assignment => {
+    const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         assignment.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCourse = selectedCourse === 'all' || 
+                         assignment.course?.title === selectedCourse;
     return matchesSearch && matchesCourse;
   });
 
-  const uniqueCourses = [
-    ...new Set(assignments.map((a) => a.course?.title).filter(Boolean)),
-  ];
+  // Get unique courses for filter dropdown
+  const uniqueCourses = [...new Set(assignments.map(a => a.course?.title).filter(Boolean))];
 
-  const isOverdue = (dueDate) => new Date(dueDate) < new Date();
-  const getDaysUntilDue = (dueDate) =>
-    Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+  // Check if assignment is overdue
+  const isOverdue = (dueDate) => {
+    return new Date(dueDate) < new Date();
+  };
+
+  // Get days until due
+  const getDaysUntilDue = (dueDate) => {
+    const days = Math.ceil((new Date(dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+    return days;
+  };
 
   if (loading) {
     return (
@@ -212,28 +426,11 @@ const ManageAssignment = () => {
                   <option key={course} value={course}>{course}</option>
                 ))}
               </select>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveView('cards')}
-                  className={`px-4 py-3 rounded-xl transition-all ${activeView === 'cards' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Assignments
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveView('submissions');
-                    loadSubmissions();
-                  }}
-                  className={`px-4 py-3 rounded-xl transition-all ${activeView === 'submissions' ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'bg-gray-100 text-gray-700'}`}
-                >
-                  Submissions
-                </button>
-              </div>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
@@ -277,25 +474,6 @@ const ManageAssignment = () => {
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-gray-800">
-                    {submissionsLoading ? (
-                      <span className="inline-block h-6 w-8 bg-gray-200 rounded animate-pulse"></span>
-                    ) : (
-                      totalSubmissions
-                    )}
-                  </p>
-                  <p className="text-sm text-gray-600">Submissions</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -310,45 +488,92 @@ const ManageAssignment = () => {
           </div>
         )}
 
-        {/* Content Area */}
-        {activeView === 'cards' ? (
-          <>
-            {/* Assignment Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredAssignments.map((assignment) => {
-                const fullFileUrl = assignment.fileUrl ? `${apiBaseUrl}${assignment.fileUrl}` : '';
-                const daysUntilDue = getDaysUntilDue(assignment.dueDate);
-                const overdue = isOverdue(assignment.dueDate);
+        {/* Assignment Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredAssignments.map((assignment) => {
+            const fullFileUrl = assignment.fileUrl ? `${apiBaseUrl}${assignment.fileUrl}` : '';
+            const daysUntilDue = getDaysUntilDue(assignment.dueDate);
+            const overdue = isOverdue(assignment.dueDate);
 
-                return (
-                  <div
-                    key={assignment._id}
-                    className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-4 ${
-                      overdue ? 'border-l-red-500' : daysUntilDue <= 3 ? 'border-l-yellow-500' : 'border-l-green-500'
-                    } overflow-hidden`}
-                  >
-                    {/* Card Header */}
-                    <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-bold text-indigo-700 truncate">
-                          {assignment.course?.title || 'Untitled Course'}
-                        </h3>
-                        <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          overdue 
-                            ? 'bg-red-100 text-red-800' 
-                            : daysUntilDue <= 3 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-green-100 text-green-800'
-                        }`}>
-                          {overdue ? 'Overdue' : daysUntilDue <= 0 ? 'Due Today' : `${daysUntilDue}d left`}
-                        </div>
-                      </div>
-                      <h4 className="font-bold text-gray-800 text-xl">{assignment.title}</h4>
+            return (
+              <div
+                key={assignment._id}
+                className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-l-4 ${
+                  overdue ? 'border-l-red-500' : daysUntilDue <= 3 ? 'border-l-yellow-500' : 'border-l-green-500'
+                } overflow-hidden`}
+              >
+                {/* Card Header */}
+                <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-bold text-indigo-700 truncate">
+                      {assignment.course?.title || 'Untitled Course'}
+                    </h3>
+                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      overdue 
+                        ? 'bg-red-100 text-red-800' 
+                        : daysUntilDue <= 3 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {overdue ? 'Overdue' : daysUntilDue <= 0 ? 'Due Today' : `${daysUntilDue}d left`}
                     </div>
+                  </div>
+                </div>
 
-                    {/* Card Content */}
-                    <div className="p-6 space-y-3">
+                {/* Card Body */}
+                <div className="p-6">
+                  {editingId === assignment._id ? (
+                    <div className="space-y-4">
+                      <input
+                        type="text"
+                        name="title"
+                        value={editForm.title}
+                        onChange={handleEditChange}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        placeholder="Assignment title"
+                      />
+                      <textarea
+                        name="description"
+                        value={editForm.description}
+                        onChange={handleEditChange}
+                        rows="3"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+                        placeholder="Assignment description"
+                      />
+                      <input
+                        type="date"
+                        name="dueDate"
+                        value={editForm.dueDate}
+                        onChange={handleEditChange}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      />
+                      {editForm.existingFileUrl && (
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <p className="text-sm text-blue-800 font-medium mb-1">Current File:</p>
+                          <a
+                            href={`${apiBaseUrl}${editForm.existingFileUrl}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 underline text-sm"
+                          >
+                            📎 View Current File
+                          </a>
+                        </div>
+                      )}
+                      <div className="relative">
+                        <input
+                          type="file"
+                          name="file"
+                          accept=".pdf,.doc,.docx,.txt"
+                          onChange={handleEditChange}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
                       <div>
+                        <h4 className="font-bold text-gray-800 text-lg mb-1">{assignment.title}</h4>
                         <p className="text-gray-600 text-sm leading-relaxed">{assignment.description}</p>
                       </div>
                       <div className="flex items-center gap-2 text-sm">
@@ -381,214 +606,65 @@ const ManageAssignment = () => {
                           <span className="text-sm italic">No attachment</span>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span>{assignment.submissions?.length || 0} submissions</span>
-                      </div>
                     </div>
+                  )}
+                </div>
 
-                    {/* Card Actions */}
-                    <div className="px-6 pb-6">
-                      {editingId === assignment._id ? (
-                        <div className="space-y-4">
-                          <input
-                            type="text"
-                            name="title"
-                            value={editForm.title}
-                            onChange={handleEditChange}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            placeholder="Assignment title"
-                          />
-                          <textarea
-                            name="description"
-                            value={editForm.description}
-                            onChange={handleEditChange}
-                            rows="3"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
-                            placeholder="Assignment description"
-                          />
-                          <input
-                            type="date"
-                            name="dueDate"
-                            value={editForm.dueDate}
-                            onChange={handleEditChange}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                          />
-                          {editForm.existingFileUrl && (
-                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                              <p className="text-sm text-blue-800 font-medium mb-1">Current File:</p>
-                              <a
-                                href={`${apiBaseUrl}${editForm.existingFileUrl}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 underline text-sm"
-                              >
-                                📎 View Current File
-                              </a>
-                            </div>
-                          )}
-                          <div className="relative">
-                            <input
-                              type="file"
-                              name="file"
-                              accept=".pdf,.doc,.docx,.txt"
-                              onChange={handleEditChange}
-                              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                            />
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => saveEdit(assignment._id)}
-                              className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
-                            >
-                              💾 Save Changes
-                            </button>
-                            <button
-                              onClick={() => setEditingId(null)}
-                              className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
-                            >
-                              ❌ Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => startEditing(assignment)}
-                            className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(assignment._id)}
-                            className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
-                          >
-                            🗑️ Delete
-                          </button>
-                        </div>
-                      )}
+                {/* Card Actions */}
+                <div className="px-6 pb-6">
+                  {editingId === assignment._id ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit(assignment._id)}
+                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
+                      >
+                        💾 Save Changes
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="flex-1 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
+                      >
+                        ❌ Cancel
+                      </button>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEditing(assignment)}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(assignment._id)}
+                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white py-2.5 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-md"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-            {/* Empty State */}
-            {filteredAssignments.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">No assignments found</h3>
-                <p className="text-gray-500 mb-6">Get started by creating your first assignment.</p>
-                <button
-                  onClick={() => navigate('/admin/addassignment')}
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 font-semibold"
-                >
-                  Create Assignment
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          /* Submissions Table View */
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">All Submissions ({totalSubmissions})</h2>
-              <p className="text-gray-600">View and manage all assignment submissions</p>
+        {/* Empty State */}
+        {filteredAssignments.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
-            
-            {submissionsLoading ? (
-              <div className="p-8 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-              </div>
-            ) : submissionsData.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Assignment
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Course
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Student
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Submitted At
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {submissionsData.map((submission) => (
-                      <tr key={submission._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {submission.assignmentTitle}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {submission.courseTitle}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {submission.studentName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {submission.studentEmail}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(submission.submittedAt).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            submission.status === 'submitted' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {submission.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {submission.fileUrl && (
-                            <a 
-                              href={`${apiBaseUrl}${submission.fileUrl}`}
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-indigo-600 hover:text-indigo-900"
-                            >
-                              Download
-                            </a>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="p-8 text-center">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">No submissions found</h3>
-                <p className="text-gray-500 mb-6">Students haven't submitted any assignments yet.</p>
-              </div>
-            )}
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No assignments found</h3>
+            <p className="text-gray-500 mb-6">Get started by creating your first assignment.</p>
+            <button
+              onClick={() => navigate('/admin/addassignment')}
+              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 font-semibold"
+            >
+              Create Assignment
+            </button>
           </div>
         )}
       </div>
