@@ -256,3 +256,15 @@ export const getEnrollmentsByStudent = async () => {
     throw error;
   }
 };
+export const submitStudentAssignment = async (assignmentId, studentId, formData) => {
+  const res = await axiosInstance.post(
+    `/student/assignments/${assignmentId}/${studentId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      }
+    }
+  );
+  return res.data;
+};

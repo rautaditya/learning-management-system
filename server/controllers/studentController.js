@@ -255,3 +255,39 @@ exports.getMyEnrollments = async (req, res) => {
   }
 };
 
+exports.submitAssignment = async (req, res) => {
+  try {
+    const { assignmentId, studentId } = req.params;
+    
+    // Verify the authenticated student matches the submission student
+    if (req.user._id.toString() !== studentId) {
+      return res.status(403).json({ error: 'Unauthorized submission' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const submission = {
+      student: studentId,
+      fileUrl: req.file.path,
+      submittedAt: new Date(),
+      status: 'submitted'
+    };
+
+    const updatedAssignment = await Assignment.findByIdAndUpdate(
+      assignmentId,
+      { $push: { submissions: submission } },
+      { new: true }
+    ).populate('submissions.student', 'name email');
+
+    res.status(201).json({
+      success: true,
+      assignment: updatedAssignment
+    });
+
+  } catch (error) {
+    console.error('Submission error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

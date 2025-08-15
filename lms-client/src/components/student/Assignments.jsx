@@ -59,7 +59,7 @@ const Assignments = () => {
     setSubmissionError('');
   };
 
-  const handleSubmitAssignment = async () => {
+const handleSubmitAssignment = async () => {
   if (!submissionFile) {
     setSubmissionError('Please select a file to upload');
     return;
@@ -77,8 +77,16 @@ const Assignments = () => {
     const formData = new FormData();
     formData.append('file', submissionFile);
 
-    // ✅ Use the actual student ID, not the token
-    const studentId = localStorage.getItem('user._id');
+    // ✅ Get student ID from correct key
+const studentData = JSON.parse(localStorage.getItem('student_user') || '{}');
+const studentId = studentData.id;
+
+if (!studentId) {
+  console.error('Student ID not found in local storage');
+  return;
+}
+
+
 
     const updatedAssignment = await submitStudentAssignment(
       selectedAssignment._id,
@@ -94,11 +102,13 @@ const Assignments = () => {
     setSubmissionFile(null);
   } catch (err) {
     console.error('Error submitting assignment:', err);
-    setSubmissionError(err.response?.data?.error || 'Failed to submit assignment');
+    setSubmissionError(err.response?.data?.error || err.message || 'Failed to submit assignment');
   } finally {
     setIsSubmitting(false);
   }
 };
+
+
 
 
 

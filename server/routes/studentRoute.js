@@ -10,7 +10,7 @@ const {
 const studentController = require('../controllers/studentController');
 const { protect } = require('../middleware/authMiddleware');
 const studentProtect = require('../middleware/studentProtect');
-const { uploadSingleImage, uploadAdminProfileImages } = require('../middleware/upload'); // Fixed importort
+const { uploadSingleImage, uploadAdminProfileImages,uploadAssignmentSubmission } = require('../middleware/upload'); // Fixed importort
 
 router.post('/signup', studentSignup);
 router.post('/send-otp', studentRequestOTP);
@@ -44,5 +44,11 @@ router.get('/enrolled-exams/:studentId', studentProtect, studentController.getEn
 
 router.get('/my-enrollments', studentProtect, studentController.getMyEnrollments); // Use studentprotect, getMyEnrollments);
 // router.get("/purchased", studentProtect, studentController.getPurchasedCourses);
+router.post(
+  '/assignments/:assignmentId/:studentId',
+  studentProtect,
+  uploadAssignmentSubmission,
+  studentController.submitAssignment
+);
 
 module.exports = router;
