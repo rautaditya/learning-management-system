@@ -23,6 +23,7 @@ const ManageAssignment = () => {
   const [submissionsData, setSubmissionsData] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [totalSubmissions, setTotalSubmissions] = useState(0);
+  const [selectedSubmissionCourse, setSelectedSubmissionCourse] = useState('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const ManageAssignment = () => {
       }
       
       setSubmissionsData(allSubmissions);
-      setTotalSubmissions(allSubmissions.length); // Update total count
+      setTotalSubmissions(allSubmissions.length);
     } catch (err) {
       console.error('Error loading submissions:', err);
       setMessage('Failed to load submissions');
@@ -143,6 +144,10 @@ const ManageAssignment = () => {
     return matchesSearch && matchesCourse;
   });
 
+  const filteredSubmissions = selectedSubmissionCourse === 'all' 
+    ? submissionsData 
+    : submissionsData.filter(sub => sub.courseTitle === selectedSubmissionCourse);
+
   const uniqueCourses = [
     ...new Set(assignments.map((a) => a.course?.title).filter(Boolean)),
   ];
@@ -202,16 +207,29 @@ const ManageAssignment = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 />
               </div>
-              <select
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
-              >
-                <option value="all">All Courses</option>
-                {uniqueCourses.map(course => (
-                  <option key={course} value={course}>{course}</option>
-                ))}
-              </select>
+              {activeView === 'cards' ? (
+                <select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="all">All Courses</option>
+                  {uniqueCourses.map(course => (
+                    <option key={course} value={course}>{course}</option>
+                  ))}
+                </select>
+              ) : (
+                <select
+                  value={selectedSubmissionCourse}
+                  onChange={(e) => setSelectedSubmissionCourse(e.target.value)}
+                  className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white"
+                >
+                  <option value="all">All Courses</option>
+                  {uniqueCourses.map(course => (
+                    <option key={course} value={course}>{course}</option>
+                  ))}
+                </select>
+              )}
               <div className="flex gap-2">
                 <button
                   onClick={() => setActiveView('cards')}
@@ -289,7 +307,7 @@ const ManageAssignment = () => {
                     {submissionsLoading ? (
                       <span className="inline-block h-6 w-8 bg-gray-200 rounded animate-pulse"></span>
                     ) : (
-                      totalSubmissions
+                      activeView === 'cards' ? totalSubmissions : filteredSubmissions.length
                     )}
                   </p>
                   <p className="text-sm text-gray-600">Submissions</p>
@@ -497,16 +515,30 @@ const ManageAssignment = () => {
         ) : (
           /* Submissions Table View */
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-800">All Submissions ({totalSubmissions})</h2>
-              <p className="text-gray-600">View and manage all assignment submissions</p>
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-800">
+                  All Submissions ({filteredSubmissions.length})
+                </h2>
+                <p className="text-gray-600">View and manage all assignment submissions</p>
+              </div>
+              <select
+                value={selectedSubmissionCourse}
+                onChange={(e) => setSelectedSubmissionCourse(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all bg-white text-sm"
+              >
+                <option value="all">All Courses</option>
+                {uniqueCourses.map(course => (
+                  <option key={course} value={course}>{course}</option>
+                ))}
+              </select>
             </div>
             
             {submissionsLoading ? (
               <div className="p-8 flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
               </div>
-            ) : submissionsData.length > 0 ? (
+            ) : filteredSubmissions.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -535,7 +567,7 @@ const ManageAssignment = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {submissionsData.map((submission) => (
+                    {filteredSubmissions.map((submission) => (
                       <tr key={submission._id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {submission.assignmentTitle}
