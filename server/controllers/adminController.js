@@ -5,6 +5,8 @@ const CourseProgress = require('../models/CourseProgress');
   const Course = require('../models/Course');
 
 const Exam = require('../models/Exam');
+const Assignment = require('../models/Assignment');
+const Video = require('../models/Video');
 
 const User = require('../models/User'); 
 const Enrollment = require('../models/Enrollment'); // ✅ Add this line
@@ -440,6 +442,41 @@ exports.getExamCompletionReport = async (req, res) => {
 
   } catch (error) {
     console.error('Exam completion error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// In your assignment controller
+// Get all submissions for a specific assignment
+exports.getAssignmentSubmissions = async (req, res) => {
+  try {
+    const assignment = await Assignment.findById(req.params.assignmentId)
+      .populate({
+        path: 'submissions.student',
+        select: 'fullName email' // Removed profileImage
+      })
+      .populate('course', 'title'); // Populate course title
+
+    if (!assignment) {
+      return res.status(404).json({ message: 'Assignment not found' });
+    }
+
+    res.json({
+      data: {
+        submissions: assignment.submissions.map(sub => ({
+          _id: sub._id,
+          studentId: sub.student._id,
+          studentName: sub.student.fullName,
+          studentEmail: sub.student.email,
+          fileUrl: sub.fileUrl,
+          submittedAt: sub.submittedAt,
+          status: sub.status.replace(',', ''), // Clean up status
+          courseTitle: assignment.course?.title
+        }))
+      }
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Server error' });
   }
 };
