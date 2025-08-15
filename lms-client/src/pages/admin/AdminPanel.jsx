@@ -34,6 +34,7 @@ import AddStudyMaterial from '../../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../../components/commonpages/ManageStudyMaterial';
 import QuestionPaper from './QuestionPaper';
 import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
+import ChatData from '../../components/commonpages/ChatData';
 //lms
 
 const AdminPanel = () => {
@@ -81,6 +82,7 @@ const AdminPanel = () => {
             <Route path="/studymaterial/add" element={<AddStudyMaterial />} />
             <Route path="/studymaterial/manage" element={<ManageStudyMaterial />} />
              <Route path="/questionpaper/:id" element={<QuestionPaper />} />
+             <Route path="/chatbot" element={<ChatData/>} />
             {/* <Route path="/logout" element={<Logout />} /> */}
           
             {/* Add more nested routes here */}

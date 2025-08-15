@@ -29,7 +29,7 @@ import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
 import QuestionPaper from '../pages/admin/QuestionPaper';
 import AddCourseCategory from '../components/commonpages/AddCourseCategory';
 import Instructors from '../components/commonpages/Instructors';
-
+import ChatData from '../components/commonpages/ChatData';
 
 export  function AdminRoutes() {
   return (
@@ -63,6 +63,7 @@ export  function AdminRoutes() {
  <Route path="questionpaper/:id" element={<QuestionPaper />} />
  <Route path="course-category" element={<AddCourseCategory />} />
  <Route path="instructors" element={<Instructors />} />
+ <Route path="chatbot" element={<ChatData />} />
 
       </Route>
     </Route>

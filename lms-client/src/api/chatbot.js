@@ -17,3 +17,13 @@ export const continueChat = async (requestId, answer) => {
   });
   return res.data;
 };
+
+export const getAllChats = async () => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE}/getallchats`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching chatbot data:", error);
+    throw error;
+  }
+};

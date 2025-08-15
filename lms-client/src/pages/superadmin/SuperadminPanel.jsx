@@ -29,6 +29,7 @@ import AddCourseCategory from '../../components/commonpages/AddCourseCategory';
 import Instructors from '../../components/commonpages/Instructors';
 import CreateExam from '../../pages/admin/CreateExam';
 import ManageExam from '../../pages/admin/ManageExam';
+import ChatData from '../../components/commonpages/ChatData.jsx';
 const SuperAdminPanel = () => {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -68,6 +69,7 @@ const SuperAdminPanel = () => {
             <Route path="discussion" element={<Discussion />} />
             <Route path="studentprogress" element={<StudentProgress />} />
             <Route path="certificates" element={<Certificates />} />
+             <Route path="chatbot" element={<ChatData />} />
           </Routes>
         </main>
       </div>

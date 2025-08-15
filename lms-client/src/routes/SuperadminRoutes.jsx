@@ -19,6 +19,7 @@ import AddStudyMaterial from '../components/commonpages/AddStudyMaterial';
 import ManageStudyMaterial from '../components/commonpages/ManageStudyMaterial';
 import AddCourseCategory from '../components/commonpages/AddCourseCategory';
 import Instructors from '../components/commonpages/Instructors';
+import ChatData from '../components/commonpages/ChatData';
 
 export function SuperadminRoutes() {
   return (
@@ -43,6 +44,7 @@ export function SuperadminRoutes() {
 <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />
 
  <Route path="instructors" element={<Instructors />} />
+  <Route path="chatbot" element={<ChatData />} />
       </Route>
 
       {/* this one is fine as it's outside nested layout */}

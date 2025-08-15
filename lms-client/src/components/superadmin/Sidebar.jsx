@@ -71,8 +71,10 @@ const SuperadminSidebar = ({ collapsed, setCollapsed }) => {
     { path: '/superadmin/instructors', icon: <UserCheck size={20} />, label: 'Instructors' },
     // { path: '/superadmin/institutes', icon: <Building size={20} />, label: 'Institutes' },
     { path: '/superadmin/contactdata', icon: <UserCog size={20} />, label: 'Contact Data' },
+    {path: '/superadmin/chatbot', icon: <MessageSquare size={20} />, label: 'Chatbot' },
     { path: '/superadmin/reports', icon: <FileBarChart size={20} />, label: 'Reports' },
     { path: '/superadmin/settings', icon: <Settings size={20} />, label: 'Settings' },
+
   ];
 
   const handleNavigation = (path) => {

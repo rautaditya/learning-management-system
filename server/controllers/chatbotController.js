@@ -70,13 +70,13 @@ exports.continueChat = async (req, res) => {
 };
 
 
-// // Get all chatbot conversations
-// exports.getAllChats = async (req, res) => {
-//   try {
-//     const chats = await HelpRequest.find().sort({ createdAt: -1 });
-//     res.status(200).json(chats);
-//   } catch (error) {
-//     console.error("Error fetching chatbot data:", error);
-//     res.status(500).json({ message: "Server Error" });
-//   }
-// };
+// Get all chatbot conversations
+exports.getAllChats = async (req, res) => {
+  try {
+    const chats = await HelpRequest.find().sort({ createdAt: -1 });
+    res.status(200).json(chats);
+  } catch (error) {
+    console.error("Error fetching chatbot data:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
