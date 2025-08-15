@@ -1,8 +1,11 @@
+
+
+
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import {
   Menu, X, Home, Info, Book, Award, MessageSquare, LogIn,
-  GraduationCap, FileText, ClipboardList, ListChecks, User, Settings, LogOut
+  GraduationCap, FileText, ClipboardList, ListChecks, User, Settings, LogOut,ShoppingBag
 } from 'lucide-react';
 import Profile from '../../pages/student/Profile';
 import Mypurchase from '../../pages/student/Mypurchase';
@@ -166,7 +169,7 @@ export default function Navbar({ onLoginClick }) {
                             }}
                             className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
-                            <Settings className="inline w-4 h-4 mr-1" />
+                            <ShoppingBag className="inline w-4 h-4 mr-1" />
                             My Purchases
                           </button>
                         </li>

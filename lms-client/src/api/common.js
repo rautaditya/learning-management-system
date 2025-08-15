@@ -232,3 +232,4 @@ export const getCourseList = async () => {
   const res = await axiosInstance.get('/courses/list');
   return res.data;
 };
+

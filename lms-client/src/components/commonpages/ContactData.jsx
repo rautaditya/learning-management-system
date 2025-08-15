@@ -1,45 +1,4 @@
-// import React from 'react';
-// import { getContactData } from '../../api/common';
 
-// const ContactData = () => {
-//   const [contactData, setContactData] = React.useState([]);
-
-//   React.useEffect(() => {
-//     const fetchContactData = async () => {
-//       try {
-//         const data = await getContactData();
-//         setContactData(data);
-//       } catch (error) {
-//         console.error('Error fetching contact data:', error);
-//       }
-//     };
-//     fetchContactData();
-//   }, []);
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-2xl font-bold mb-4">Contact Submissions</h2>
-//       {contactData.length === 0 ? (
-//         <p>No contact data found.</p>
-//       ) : (
-//         <ul className="space-y-4">
-//           {contactData.map((item, index) => (
-//             <li key={index} className="border p-4 rounded shadow">
-//               <p><strong>Name:</strong> {item.name}</p>
-//               <p><strong>Email:</strong> {item.email}</p>
-//               <p><strong>Message:</strong> {item.message}</p>
-//               <p><strong>Subject:</strong> {item.subject}</p>
-//               <p><strong>Department:</strong> {item.department}</p>
-//              <p><strong>SubmittedAt</strong>{item.submittedAt}</p>
-//             </li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ContactData;
 import React, { useState, useEffect } from 'react';
 import { getContactData } from '../../api/common';
 import { ChevronDown, ChevronUp, Mail, User, MessageSquare, Briefcase, Calendar } from 'lucide-react';

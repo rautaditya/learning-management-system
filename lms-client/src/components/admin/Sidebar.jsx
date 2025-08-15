@@ -79,6 +79,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     { path: '/admin/instructors', icon: <UserCheck size={20} />, label: 'Instructors' },
     { path: '/admin/reports', icon: <FileBarChart size={20} />, label: 'Reports' },
     { path: '/admin/contactdata', icon: <MessageSquare size={20} />, label: 'Contact Data' },
+    {path: '/admin/chatbot', icon: <MessageSquare size={20} />, label: 'Chatbot' },
     { path: '/admin/settings', icon: <Settings size={20} />, label: 'Settings' },
     { path: '/logout', icon: <LogOut size={20} />, label: 'Logout', className: 'mt-6 text-red-500' }
   ];

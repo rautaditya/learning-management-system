@@ -14,6 +14,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const studyMaterialRoutes = require('./routes/studyMaterialRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
   // Middleware to parse JSON bodies
   app.use(express.json());
 
@@ -49,6 +50,7 @@ app.use('/api/exam', require('./routes/ExamRoute'));
 app.use('/api/',studyMaterialRoutes);
 app.use('/api/progress',progressRoutes);
 app.use('/api/',certificateRoutes);
+app.use('/api/chatbot', require('./routes/chatbotRoutes'));
   // Start the server
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
