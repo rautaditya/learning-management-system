@@ -238,34 +238,20 @@ exports.getMyAssignments = async (req, res) => {
 
 
 
-// exports.getEnrollmentsByStudent = async (req, res) => {
-//   try {
-//     const enrollments = await Enrollment.find()
-//       .populate('student', 'fullName email')
-//       .populate('courseId', 'title')
-//       .sort({ createdAt: -1 });
-//     res.status(200).json(enrollments);
-//   } catch (error) {
-//     console.error('Error fetching enrollments:', error);
-//     res.status(500).json({ message: 'Server Error' });
-//   }
-// };
-
-exports.getPurchasedCourses = async (req, res) => {
+exports.getMyEnrollments = async (req, res) => {
   try {
-    // req.user._id will come from authentication middleware
-    const studentId = req.user._id;
+    // Assuming user is authenticated and req.user._id is set by auth middleware
+    const userId = req.user._id;
 
-    const enrollments = await Enrollment.find({ student: studentId })
-      .populate("courseId", "title description instructor courseImage") // select only needed fields
+    const enrollments = await Enrollment.find({ student: userId })
+      .populate('courseId', 'title price') // fetch only title & price from Course
+      .populate('student', 'fullName email') // fetch student info if needed
       .sort({ enrolledAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      data: enrollments
-    });
+    res.status(200).json(enrollments);
   } catch (error) {
-    console.error("Error fetching purchased courses:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error('Error fetching enrolled courses:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
+

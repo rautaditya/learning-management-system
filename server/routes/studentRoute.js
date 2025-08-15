@@ -42,7 +42,7 @@ router.get('/course/:id', studentProtect,studentController.getStudentCourseById)
 router.get('/assignments', studentProtect, studentController.getMyAssignments);
 router.get('/enrolled-exams/:studentId', studentProtect, studentController.getEnrolledExams);
 
-// router.get('/enrollments/:studentId', studentProtect, studentController.getEnrollmentsByStudent);
-router.get("/purchased", studentProtect, studentController.getPurchasedCourses);
+router.get('/my-enrollments', studentProtect, studentController.getMyEnrollments); // Use studentprotect, getMyEnrollments);
+// router.get("/purchased", studentProtect, studentController.getPurchasedCourses);
 
 module.exports = router;

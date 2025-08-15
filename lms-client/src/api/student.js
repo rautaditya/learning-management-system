@@ -247,11 +247,12 @@ export const updateStudentProfile = async (id, updatedData) => {
 
 
 
-export const getPurchasedCourses = async (token) => {
-  const res = await axios.get("/enrollments/purchased", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
+export const getEnrollmentsByStudent = async () => {
+  try {
+    const response = await axiosInstance.get('/student/my-enrollments');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching enrollments:", error);
+    throw error;
+  }
 };
