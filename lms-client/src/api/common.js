@@ -233,3 +233,13 @@ export const getCourseList = async () => {
   return res.data;
 };
 
+
+export const generateCertificate = (courseId, studentId) => {
+  return axios.post('/api/certificates/generate', { courseId, studentId })
+    .then(res => res.data)
+    .catch(err => {
+      console.error('Error generating certificate:', err);
+      throw err;
+    });
+};
+export const getIssuedCertificates = async () => { const res = await axiosInstance.get('/issued'); return res.data; };
