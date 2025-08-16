@@ -1,12 +1,9 @@
-// =======================
-// 1. models/Certificate.js
-// =======================
 const mongoose = require('mongoose');
 
 const certificateSchema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'User', // Make sure 'User' matches the model name in your user schema
     required: true
   },
   course: {
@@ -14,14 +11,8 @@ const certificateSchema = new mongoose.Schema({
     ref: 'Course',
     required: true
   },
-  templateName: {
-    type: String,
-    default: 'Course Completion'
-  },
-  issuedDate: {
-    type: Date,
-    default: Date.now
-  },
+  templateName: String,
+  issuedDate: Date,
   status: {
     type: String,
     enum: ['Issued', 'Revoked'],
