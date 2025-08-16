@@ -169,7 +169,7 @@ exports.getEnrolledExams = async (req, res) => {
 
   try {
     // ✅ Step 1: Get enrolled course IDs for the student
-    const enrollments = await Enrollment.find({ student: studentId }).populate('courseId');
+    const enrollments = await Enrollment.find({ student: _id }).populate('courseId');
 
     if (!enrollments || enrollments.length === 0) {
       return res.status(200).json({ exams: [] });
