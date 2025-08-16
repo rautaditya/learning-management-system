@@ -480,3 +480,23 @@ exports.getAssignmentSubmissions = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+exports.getStudentCourseProgress = async (req, res) => {
+  try {
+    const { courseId, studentId } = req.params;
+
+    const progress = await CourseProgress.findOne({
+      course: courseId,
+      student: studentId,
+    });
+
+    res.json({
+      courseId,
+      studentId,
+      progress: progress ? progress.progress : 0, // assume "progress" is stored as a number 0–100
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

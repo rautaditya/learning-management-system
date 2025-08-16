@@ -197,3 +197,15 @@ export const getAssignmentSubmissions = async (assignmentId) => {
   });
   return res.data;
 };
+
+// api/admin.js
+export const getStudentCourseProgress = async (courseId, studentId) => {
+  const token = localStorage.getItem("token");
+  const res = await axiosInstance.get(
+    `/admin/completion/${courseId}/${studentId}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+};
