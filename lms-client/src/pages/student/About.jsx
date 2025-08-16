@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Users, BookOpen, Award, ChevronRight, Sparkles, GraduationCap, Code, ArrowRight } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 export default function About() {
   const [animate, setAnimate] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     setAnimate(true);
@@ -14,10 +16,9 @@ export default function About() {
   ];
 
   const teamMembers = [
-    { name: "Alex Morgan", role: "Founder & CEO", image: "/api/placeholder/400/400" },
-    { name: "Jamie Wilson", role: "Head of Education", image: "/api/placeholder/400/400" },
-    { name: "Taylor Reed", role: "Chief Technology Officer", image: "/api/placeholder/400/400" },
-    { name: "Casey Jordan", role: "Student Success Lead", image: "/api/placeholder/400/400" }
+    { name: "Vaishali Suryavanshi", role: "Founder & CEO", image: "/api/placeholder/400/400" },
+    { name: "Vaishali Suryavanshi", role: "Founder & CEO", image: "/api/placeholder/400/400" },
+    { name: "Vaishali Suryavanshi", role: "Founder & CEO", image: "/api/placeholder/400/400" }
   ];
 
   return (
@@ -42,7 +43,7 @@ export default function About() {
           <div className={`text-center transition-all duration-1000 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 mt-10">Transforming Education Together</h1>
             <p className="text-xl max-w-3xl mx-auto mb-8">We're on a mission to make quality education accessible, engaging, and effective for everyone through innovative learning solutions.</p>
-            <button className="bg-white text-indigo-600 font-medium px-6 py-3 rounded-lg flex items-center gap-2 mx-auto hover:bg-opacity-90 transition-all">
+            <button onClick={() => navigate('/courses')}className="bg-white text-indigo-600 font-medium px-6 py-3 rounded-lg flex items-center gap-2 mx-auto hover:bg-opacity-90 transition-all">
               Explore Our Courses <ChevronRight size={18} />
             </button>
           </div>
@@ -166,14 +167,14 @@ export default function About() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
             {teamMembers.map((member, index) => (
               <div 
                 key={index}
                 className={`bg-white rounded-xl shadow-md overflow-hidden transition-all duration-700 hover:shadow-lg hover:-translate-y-1 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                 style={{transitionDelay: `${300 + index * 100}ms`}}
               >
-                <img src={member.image} alt={member.name} className="w-full h-64 object-cover" />
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTy6rhASBVTUuV6ZfAHC4iJEyWOnz9KLXc6Bw&s" alt={member.name} className="w-full h-66 object-cover" />
                 <div className="p-6">
                   <h3 className="text-xl font-bold">{member.name}</h3>
                   <p className="text-indigo-600">{member.role}</p>
@@ -192,7 +193,7 @@ export default function About() {
             Join thousands of educators and learners who are already using EduLearn to achieve their educational goals.
           </p>
           <div className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 delay-200 ${animate ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <button className="bg-white text-indigo-600 font-medium px-8 py-3 rounded-lg flex items-center gap-2 justify-center hover:bg-opacity-90 transition-all">
+            <button onClick={() => navigate('/courses')}className="bg-white text-indigo-600 font-medium px-8 py-3 rounded-lg flex items-center gap-2 justify-center hover:bg-opacity-90 transition-all">
               Get Started Free <ArrowRight size={18} />
             </button>
             <button className="bg-transparent border-2 border-white font-medium px-8 py-3 rounded-lg flex items-center gap-2 justify-center hover:bg-white hover:bg-opacity-10 transition-all">

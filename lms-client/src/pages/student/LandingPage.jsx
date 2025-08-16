@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   BookOpen, 
@@ -15,12 +16,16 @@ import {
   Code,
   PenTool,
   Database,
-  BarChart2
+  BarChart2,
+  X
 } from 'lucide-react';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const [showVideo, setShowVideo] = useState(false);
+  const videoUrl = "https://videos.pexels.com/video-files/9559153/9559153-uhd_2732_1440_25fps.mp4";
   
   // Animate sections as they come into view
   const [animateSections, setAnimateSections] = useState({
@@ -131,19 +136,40 @@ export default function LandingPage() {
                 Discover thousands of courses taught by industry experts and enhance your skills with our interactive learning platform.
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
-                <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                <button onClick={() => navigate('/courses')} className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
                   Get Started
                 </button>
-                <button className="px-6 py-3 bg-white text-gray-800 font-medium rounded-lg shadow-sm hover:shadow border border-gray-200 hover:border-gray-300 flex items-center justify-center">
+                <button onClick={() => setShowVideo(true)} className="px-6 py-3 bg-white text-gray-800 font-medium rounded-lg shadow-sm hover:shadow border border-gray-200 hover:border-gray-300 flex items-center justify-center">
                   <Play size={16} className="mr-2 text-blue-600" />
                   Watch Demo
                 </button>
+                 {showVideo && (
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div className="relative w-full max-w-4xl">
+          <button 
+            onClick={() => setShowVideo(false)}
+            className="absolute -top-10 right-0 text-white"
+          >
+            <X size={24} />
+          </button>
+          
+          <video 
+            controls 
+            autoPlay 
+            className="w-full rounded-lg"
+          >
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    )}
               </div>
             </div>
             
             <div className="relative h-64 md:h-auto flex items-center justify-center">
               <img 
-                src="/api/placeholder/540/400" 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRijnlQwNpkesn9dwKE7YYlwnncABydSe9_aA&s" 
                 alt="Learning platform showcase" 
                 className="rounded-lg shadow-xl transform hover:scale-105 transition-transform duration-500"
               />
@@ -324,10 +350,10 @@ export default function LandingPage() {
             Join thousands of students already learning on Vivaaks LMS. Get unlimited access to all courses.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="px-8 py-4 bg-white text-blue-600 font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-lg">
+            <button onClick={() => navigate('/aboutus')} className="px-8 py-4 bg-white text-blue-600 font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all text-lg">
               Get Started For Free
             </button>
-            <button className="px-8 py-4 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors text-lg">
+            <button onClick={() => navigate('/courses')}className="px-8 py-4 bg-transparent border-2 border-white text-white font-medium rounded-lg hover:bg-white/10 transition-colors text-lg">
               Explore Courses
             </button>
           </div>
