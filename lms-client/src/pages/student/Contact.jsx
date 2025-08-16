@@ -203,8 +203,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h4 className="text-lg font-medium text-gray-800">Email</h4>
-                    <p className="text-gray-600">support@edulearn.com</p>
-                    <p className="text-gray-600">info@edulearn.com</p>
+                    <p className="text-gray-600">vivaakshr@gmail.com</p>
+                    <p className="text-gray-600">vavstechnologies@gmail.com</p>
                   </div>
                 </div>
 
@@ -216,7 +216,7 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h4 className="text-lg font-medium text-gray-800">Phone</h4>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
+                    <p className="text-gray-600">+919901328510</p>
                     <p className="text-gray-600">Mon-Fri, 9am-5pm EST</p>
                   </div>
                 </div>
@@ -230,8 +230,8 @@ const Contact = () => {
                   </div>
                   <div className="ml-4">
                     <h4 className="text-lg font-medium text-gray-800">Office</h4>
-                    <p className="text-gray-600">123 Education Street</p>
-                    <p className="text-gray-600">Boston, MA 02115</p>
+                    <p className="text-gray-600">NO 512/10 OUTER RING ROAD,<br />NEXT TO MORE MEGA STORE,</p>
+                    <p className="text-gray-600">MAHADEVAPURA BANGALORE ,560048</p>
                   </div>
                 </div>
               </div>
