@@ -7,6 +7,7 @@ import InstituteList from '../pages/superadmin/InstituteList';
 import Sreports from '../pages/superadmin/Sreports';
 import Ssettings from '../pages/superadmin/Ssettings';
 import ManageAllCourses from '../pages/superadmin/ManageAllCourses';
+import Discussion from '../components/commonpages/Discussion';
 import CourseDetails from '../pages/superadmin/CourseDetails';
 import AddCourse from '../components/commonpages/AddCourse';
 import ContactData from '../components/commonpages/ContactData';
@@ -39,6 +40,7 @@ export function SuperadminRoutes() {
         <Route path="logout" element={<Logout />} />
         <Route path="profile" element={<SuperadminProfile />} />
         <Route path="course-category" element={<AddCourseCategory />} />
+        <Route path="discussion" element={<Discussion />} /> 
         
         <Route path="studymaterial/add" element={<AddStudyMaterial />} />
 <Route path="studymaterial/manage" element={<ManageStudyMaterial />} />

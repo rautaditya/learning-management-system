@@ -5,7 +5,7 @@ import Header from '../../components/superadmin/Header';
 import AddAdmin from './AddAdmin.jsx'; 
 import Sdashboard from './Sdashboard';
 import ManageAdmins from './ManageAdmins';
-import Discussion from '../../pages/admin/Discussion';
+import Discussion from '../../components/commonpages/Discussion.jsx';
 import StudentProgress from '../../pages/admin/Student Progress';
 import Certificates from '../../pages/admin/Certificates';  
 import ManageAllCourses from './ManageAllCourses.jsx';

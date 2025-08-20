@@ -15,7 +15,7 @@ import ManageExam from './ManageExam';
 import ManageStudents  from '../../components/commonpages/ManageStudents';
 import EnrollmentLogs from '../../components/commonpages/EnrollmentLogs';
 
-import Discussion from './Discussion';
+import Discussion from '../../components/commonpages/Discussion';
 import StudentProgress from './Student Progress';
 import Certificates from './Certificates';  
 import Instructors from '../../components/commonpages/Instructors';

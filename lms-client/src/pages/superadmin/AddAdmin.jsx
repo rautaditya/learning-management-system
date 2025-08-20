@@ -5,6 +5,7 @@ import { addAdmin } from '../../api/superadmin'; // adjust path based on your st
 const AddAdmin = () => {
   const [formData, setFormData] = useState({
     fullName: '',
+    username: '',
     email: '',
     mobile: '',
     password: '',
@@ -53,6 +54,17 @@ const AddAdmin = () => {
               <input
                 name="fullName"
                 value={formData.fullName}
+                onChange={handleChange}
+                type="text"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+              <input
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 type="text"
                 required

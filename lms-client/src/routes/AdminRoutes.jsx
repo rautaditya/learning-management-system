@@ -6,7 +6,7 @@ import AddAssignment from '../pages/admin/AddAssignment';
 import ManageAssignment from '../pages/admin/ManageAssignment';
 import VideoContent from '../components/commonpages/VideoContent';
 import ManageVideo from '../components/commonpages/ManageVideo';
-import Discussion from '../pages/admin/Discussion';
+import Discussion from '../components/commonpages/Discussion';
 import StudentProgress from '../pages/admin/Student Progress';
 import Certificates from '../pages/admin/Certificates';
 
