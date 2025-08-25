@@ -92,6 +92,7 @@ export default function Navbar({ onLoginClick }) {
     { name: 'Study Material', path: '/studymaterials', icon: <FileText className="w-4 h-4 mr-1" /> },
     { name: 'Assignments', path: '/assignments', icon: <ClipboardList className="w-4 h-4 mr-1" /> },
     { name: 'Exam', path: '/exam', icon: <ListChecks className="w-4 h-4 mr-1" /> },
+    { name: 'Notifications', path: '/notifications', icon: <ListChecks className="w-4 h-4 mr-1" /> },
   ];
 
   return (

@@ -17,7 +17,7 @@ import Exam from '../components/student/Exam';
 import Assignments from '../components/student/Assignments';
 import StudentStudyMaterials from '../pages/student/StudentStudyMaterials';
 import Mypurchase from '../pages/student/Mypurchase';
-
+import StudentAnnouncements from '../components/student/announcements';
 export function StudentRoutes() {
   const location = useLocation();
   const state = location.state || {};
@@ -42,6 +42,7 @@ export function StudentRoutes() {
       </Route>
       <Route path="/exam/:examId/take" element={<TakeExam />} />
       <Route path="/mypurchase" element={<Mypurchase />} />
+      <Route path="/notifications" element={<StudentAnnouncements />} />
     </>
 
 

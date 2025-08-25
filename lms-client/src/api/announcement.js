@@ -83,3 +83,18 @@ export const getAllStudents = async () => {
     throw err;
   }
 };
+export const getCourseAnnouncementsForStudent = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axiosInstance.get(
+      `/announcement/user/${userId}/course-announcements`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching course announcements:", err);
+    throw err;
+  }
+};
