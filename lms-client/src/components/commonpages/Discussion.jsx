@@ -5,113 +5,136 @@ import {
   getAllSuperAdmins,
   getAllCourses,
   getMyAnnouncements,
+  sendReply,
 } from '../../api/announcement';
 
 const AnnouncementPage = () => {
-  const [recipientType, setRecipientType] = useState('');
+  const loggedInUserId = '681d86a55c5b2b92caee9509'; // replace with dynamic logged-in user ID
+
+  const [tab, setTab] = useState('received'); // received, sent-admin, sent-student
   const [admins, setAdmins] = useState([]);
   const [superAdmins, setSuperAdmins] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [recipientType, setRecipientType] = useState('');
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [message, setMessage] = useState('');
-  const [announcements, setAnnouncements] = useState([]);
-  const [dateFilter, setDateFilter] = useState('all');
+  const [replyText, setReplyText] = useState({});
   const [loading, setLoading] = useState(false);
+  const [dateFilter, setDateFilter] = useState('all');
   const [error, setError] = useState('');
-  const [showForm, setShowForm] = useState(false);
   const [readAnnouncements, setReadAnnouncements] = useState([]);
 
-  // ✅ Fetch admins once
+  // Fetch all data once
   useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const data = await getAllAdmins();
-        setAdmins(data);
-      } catch (err) {
-        setError('Failed to load admins');
-      }
-    };
-    fetchAdmins();
+    getAllAdmins().then(setAdmins).catch(() => setError('Failed to load admins'));
+    getAllSuperAdmins().then(setSuperAdmins).catch(() => setError('Failed to load superadmins'));
+    getAllCourses().then(setCourses).catch(() => setError('Failed to load courses'));
   }, []);
 
-  // ✅ Fetch superadmins once
-  useEffect(() => {
-    const fetchSuperAdmins = async () => {
-      try {
-        const data = await getAllSuperAdmins();
-        setSuperAdmins(data);
-      } catch (err) {
-        setError('Failed to load superadmins');
-      }
-    };
-    fetchSuperAdmins();
-  }, []);
+  // Fetch announcements
+  const fetchAnnouncements = async () => {
+    setLoading(true);
+    try {
+      const data = await getMyAnnouncements({ dateRange: dateFilter });
+      setAnnouncements(data);
+    } catch (err) {
+      console.error('Error fetching announcements:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // ✅ Fetch courses once
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const data = await getAllCourses();
-        setCourses(data);
-      } catch (err) {
-        setError('Failed to load courses');
-      }
-    };
-    fetchCourses();
-  }, []);
-
-  // ✅ Fetch announcements (with filter)
-  useEffect(() => {
-    const fetchAnnouncements = async () => {
-      setLoading(true);
-      try {
-        let filters = {};
-        if (dateFilter !== 'all') {
-          filters.dateRange = dateFilter;
-        }
-        const data = await getMyAnnouncements(filters);
-        setAnnouncements(data);
-      } catch (err) {
-        console.error('Error fetching announcements:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAnnouncements();
   }, [dateFilter]);
 
-  // ✅ Send announcement
+  // Send announcement
   const handleSend = async () => {
     if (!recipientType || !message) {
       alert('Please select recipient type and enter message');
       return;
     }
 
-    await sendAnnouncement({
-      role: recipientType,
-      targetId: selectedRecipient,
-      message,
-      senderId: "66c4f7f2e8a9c31d1c123456" // 👈 replace with logged-in user id
-    });
-
-    alert('Announcement sent successfully');
-    setMessage('');
-    setSelectedRecipient('');
-    setDateFilter('all'); // reload all messages
-    setShowForm(false);
+    try {
+      await sendAnnouncement({
+        role: recipientType,
+        targetId: selectedRecipient,
+        message,
+        senderId: loggedInUserId,
+      });
+      setMessage('');
+      setSelectedRecipient('');
+      setShowForm(false);
+      fetchAnnouncements();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // ✅ Mark announcement as read (local only)
+  // Send reply
+  const handleReply = async (announcementId) => {
+    if (!replyText[announcementId]) return;
+    try {
+      await sendReply({
+        announcementId,
+        message: replyText[announcementId],
+      });
+      setReplyText({ ...replyText, [announcementId]: '' });
+      fetchAnnouncements();
+    } catch (err) {
+      console.error('Error sending reply:', err);
+    }
+  };
+
+  // Mark as read
   const markAsRead = (id) => {
     setReadAnnouncements((prev) => [...prev, id]);
   };
 
+  // Filter announcements for tabs
+  const filteredAnnouncements = announcements.filter((a) => {
+    const senderId = a.sender?._id?.toString() || a.sender.toString();
+
+    if (tab === 'received') {
+      const recipientsIds = a.recipients?.map((r) => r.toString()) || [];
+      return recipientsIds.includes(loggedInUserId) && senderId !== loggedInUserId && !readAnnouncements.includes(a._id);
+    }
+
+    if (tab === 'sent-admin') {
+      return senderId === loggedInUserId && (a.role === 'admin' || a.role === 'superadmin');
+    }
+
+    if (tab === 'sent-student') {
+      return senderId === loggedInUserId && a.role === 'student';
+    }
+
+    return false;
+  });
+
+  // Count messages for tabs
+  const receivedCount = announcements.filter((a) => {
+    const senderId = a.sender?._id?.toString() || a.sender.toString();
+    const recipientsIds = a.recipients?.map((r) => r.toString()) || [];
+    return recipientsIds.includes(loggedInUserId) && senderId !== loggedInUserId && !readAnnouncements.includes(a._id);
+  }).length;
+
+  const sentAdminCount = announcements.filter((a) => {
+    const senderId = a.sender?._id?.toString() || a.sender.toString();
+    return senderId === loggedInUserId && (a.role === 'admin' || a.role === 'superadmin');
+  }).length;
+
+  const sentStudentCount = announcements.filter((a) => {
+    const senderId = a.sender?._id?.toString() || a.sender.toString();
+    return senderId === loggedInUserId && a.role === 'student';
+  }).length;
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header with button on the right */}
+    <div className="p-6 max-w-5xl mx-auto">
+      {/* Header with New Button */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Discussion/Announcements</h2>
+        <h2 className="text-xl font-bold">Announcements</h2>
         {!showForm && (
           <button
             className="bg-blue-500 text-white px-3 py-1.5 rounded text-sm shadow-sm hover:bg-blue-600"
@@ -124,11 +147,35 @@ const AnnouncementPage = () => {
 
       {error && <p className="text-red-500 mb-3">{error}</p>}
 
+      {/* Tabs */}
+      <div className="flex gap-4 mb-4">
+        <button
+          className={`px-3 py-1 rounded ${tab === 'received' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => setTab('received')}
+        >
+          Received ({receivedCount})
+        </button>
+
+        <button
+          className={`px-3 py-1 rounded ${tab === 'sent-admin' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => setTab('sent-admin')}
+        >
+          Sent to Admin/Superadmin ({sentAdminCount})
+        </button>
+
+        <button
+          className={`px-3 py-1 rounded ${tab === 'sent-student' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          onClick={() => setTab('sent-student')}
+        >
+          Sent to Students ({sentStudentCount})
+        </button>
+      </div>
+
+      {/* New Announcement Form */}
       {showForm && (
-        <div className="border rounded p-4 mb-6 bg-gray-50 shadow-sm">
+        <div className="border p-4 rounded mb-6 bg-gray-50 shadow-sm">
           <h3 className="text-lg font-bold mb-3">Create Announcement</h3>
 
-          {/* Recipient type dropdown */}
           <select
             className="border p-2 w-full mb-3"
             value={recipientType}
@@ -143,7 +190,6 @@ const AnnouncementPage = () => {
             <option value="superadmin">Superadmin</option>
           </select>
 
-          {/* Dynamic dropdown */}
           {recipientType === 'student' && (
             <select
               className="border p-2 w-full mb-3"
@@ -153,65 +199,38 @@ const AnnouncementPage = () => {
               <option value="">Select Course</option>
               <option value="all">All Courses</option>
               {courses.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.title}
-                </option>
+                <option key={c._id} value={c._id}>{c.title}</option>
               ))}
             </select>
           )}
 
-          {recipientType === 'admin' && (
+          {(recipientType === 'admin' || recipientType === 'superadmin') && (
             <select
               className="border p-2 w-full mb-3"
               value={selectedRecipient}
               onChange={(e) => setSelectedRecipient(e.target.value)}
             >
-              <option value="">Select Admin</option>
-              <option value="all">All Admins</option>
-              {admins.map((a) => (
-                <option key={a._id} value={a._id}>
-                  {a.fullName}
-                </option>
+              <option value="">Select {recipientType}</option>
+              <option value="all">All {recipientType}s</option>
+              {(recipientType === 'admin' ? admins : superAdmins).map((u) => (
+                <option key={u._id} value={u._id}>{u.fullName}</option>
               ))}
             </select>
           )}
 
-          {recipientType === 'superadmin' && (
-            <select
-              className="border p-2 w-full mb-3"
-              value={selectedRecipient}
-              onChange={(e) => setSelectedRecipient(e.target.value)}
-            >
-              <option value="">Select Superadmin</option>
-              <option value="all">All Superadmins</option>
-              {superAdmins.map((s) => (
-                <option key={s._id} value={s._id}>
-                  {s.fullName}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* Message input */}
           <textarea
             className="border p-2 w-full mb-3"
             rows="3"
-            placeholder="Enter announcement message"
+            placeholder="Enter message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
 
           <div className="flex gap-3">
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={handleSend}
-            >
+            <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleSend}>
               Send
             </button>
-            <button
-              className="bg-gray-400 text-white px-4 py-2 rounded"
-              onClick={() => setShowForm(false)}
-            >
+            <button className="bg-gray-400 text-white px-4 py-2 rounded" onClick={() => setShowForm(false)}>
               Cancel
             </button>
           </div>
@@ -220,11 +239,7 @@ const AnnouncementPage = () => {
 
       {/* Date Filter */}
       <div className="mb-4">
-        <select
-          className="border p-2"
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-        >
+        <select className="border p-2" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
           <option value="all">All</option>
           <option value="today">Today</option>
           <option value="7days">Last 7 Days</option>
@@ -232,26 +247,30 @@ const AnnouncementPage = () => {
         </select>
       </div>
 
-      {/* Announcements List */}
+      {/* Announcement List */}
       {loading ? (
-        <p className="text-gray-500">Loading announcements...</p>
-      ) : announcements.length === 0 ? (
+        <p>Loading announcements...</p>
+      ) : filteredAnnouncements.length === 0 ? (
         <p>No announcements found</p>
       ) : (
-        <div className="space-y-3">
-          {announcements.map((a) => (
-            <div
-              key={a._id}
-              className={`border rounded p-3 shadow-sm ${
-                readAnnouncements.includes(a._id) ? 'bg-gray-200' : 'bg-gray-50'
-              }`}
-            >
+        <div className="space-y-4">
+          {filteredAnnouncements.map((a) => (
+            <div key={a._id} className="border rounded p-4 shadow-sm bg-gray-50">
               <p className="font-medium">{a.message}</p>
+
+              {tab === 'sent-student' && (
+                <p className="text-sm text-gray-500">
+                  Course: {a.targetId === 'all' ? 'All Courses' : (courses.find(c => c._id === a.targetId)?.title || 'Unknown')}
+                </p>
+              )}
+
               <p className="text-xs text-gray-500">
-                From: {a.sender?.fullName || 'Unknown'} ({a.sender?.email || 'No Email'}) | Date:{' '}
+                From: {a.sender?.fullName || 'Unknown'} ({a.sender?.email}) | {a.sender?.role} |{' '}
                 {new Date(a.createdAt).toLocaleString()}
               </p>
-              {!readAnnouncements.includes(a._id) && (
+
+              {/* Mark as Read */}
+              {tab === 'received' && !readAnnouncements.includes(a._id) && (
                 <button
                   className="text-blue-600 text-sm mt-2"
                   onClick={() => markAsRead(a._id)}
@@ -259,6 +278,32 @@ const AnnouncementPage = () => {
                   Mark as Read
                 </button>
               )}
+
+              {/* Replies */}
+              {a.replies?.length > 0 && (
+                <div className="mt-3 pl-4 border-l space-y-2">
+                  {a.replies.map((r) => (
+                    <div key={r._id} className="bg-white p-2 rounded shadow-sm">
+                      <p className="text-sm">{r.replyMessage}</p>
+                      <p className="text-xs text-gray-500">{r.sender?.fullName} | {new Date(r.createdAt).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Reply Input */}
+              <div className="flex mt-2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Write a reply..."
+                  className="flex-1 border rounded p-2 text-sm"
+                  value={replyText[a._id] || ''}
+                  onChange={(e) => setReplyText({ ...replyText, [a._id]: e.target.value })}
+                />
+                <button className="bg-blue-500 text-white px-3 rounded text-sm" onClick={() => handleReply(a._id)}>
+                  Reply
+                </button>
+              </div>
             </div>
           ))}
         </div>
