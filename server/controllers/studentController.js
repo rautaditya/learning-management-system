@@ -291,3 +291,29 @@ exports.submitAssignment = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+// controllers/announcementController.js
+const Announcement = require("../models/announcementModel");
+
+exports.getCourseAnnouncementsForStudent = async (req, res) => {
+  try {
+    const studentId = req.params.userId; // or req.user._id if using auth middleware
+
+    // 1️⃣ Get all course IDs the student is enrolled in
+    const enrollments = await Enrollment.find({ student: studentId }).select("courseId");
+    const enrolledCourseIds = enrollments.map(e => e.courseId.toString());
+
+    // 2️⃣ Fetch announcements targeted to these courses
+    const announcements = await Announcement.find({
+      targetId: { $in: enrolledCourseIds }
+    })
+      .populate("sender", "fullName role") // who sent
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, announcements });
+  } catch (err) {
+    console.error("Error fetching course announcements:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+

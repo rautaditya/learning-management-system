@@ -21,13 +21,15 @@ export const sendAnnouncement = async (data) => {
 //     throw err;
 //   }
 // };
-export const getMyAnnouncements = async (userId) => {
+export const getMyAnnouncements = async (params = {}) => {
   const token = localStorage.getItem("token");
-  const res = await axiosInstance.get(`/announcement/user/${userId}`, {
+  const res = await axiosInstance.get(`/announcement/user`, {
     headers: { Authorization: `Bearer ${token}` },
+    params, // for dateFilter or other query params
   });
   return res.data;
 };
+
 
 // Get all courses (for student target dropdown)
 export const getAllCourses = async () => {
@@ -80,6 +82,33 @@ export const getAllStudents = async () => {
     return res.data;
   } catch (err) {
     console.error("Error fetching students:", err);
+    throw err;
+  }
+};
+export const getCourseAnnouncementsForStudent = async (userId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axiosInstance.get(
+      `/announcement/user/${userId}/course-announcements`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching course announcements:", err);
+    throw err;
+  }
+};
+
+// ✅ Send Reply
+
+export const sendReply = async (data) => {
+  try {
+    const res = await axiosInstance.post("/announcement/reply", data);
+    return res.data;
+  } catch (err) {
+    console.error("Error sending announcement:", err);
     throw err;
   }
 };

@@ -50,5 +50,11 @@ router.post(
   uploadAssignmentSubmission,
   studentController.submitAssignment
 );
+const { getCourseAnnouncementsForStudent } = require("../controllers/studentController");
+router.get(
+  "/user/:userId/course-announcements",
+  studentProtect,
+  getCourseAnnouncementsForStudent
+);
 
 module.exports = router;
