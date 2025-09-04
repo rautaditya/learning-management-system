@@ -145,8 +145,7 @@
 //   uploadStudyMaterial: multer({ storage: studyMaterialStorage, fileFilter }).single('file'),
 //   uploadGeneric: upload,
 //   uploadCertificateTemplate // 👈 added
-// };
-
+// };c
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -179,6 +178,15 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// 📁 Filename generator (safe + timestamped)
+const generateFilename = (file) => {
+  const ext = path.extname(file.originalname);
+  const baseName = path
+    .basename(file.originalname, ext)
+    .replace(/[^a-zA-Z0-9-_]/g, '_');
+  return `${Date.now()}-${baseName}${ext}`;
+};
+
 // ✅ Main storage (videos/images/others)
 const defaultStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -189,9 +197,7 @@ const defaultStorage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
-    cb(null, `${Date.now()}-${baseName}${ext}`);
+    cb(null, generateFilename(file));
   }
 });
 
@@ -203,9 +209,7 @@ const studyMaterialStorage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
-    cb(null, `${Date.now()}-${baseName}${ext}`);
+    cb(null, generateFilename(file));
   }
 });
 
@@ -217,11 +221,10 @@ const certificateTemplateStorage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
-    cb(null, `${Date.now()}-${baseName}${ext}`);
+    cb(null, generateFilename(file));
   }
 });
+
 // ✅ Assignment submissions storage
 const assignmentSubmissionStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -230,12 +233,9 @@ const assignmentSubmissionStorage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
-    cb(null, `${Date.now()}-${baseName}${ext}`);
+    cb(null, generateFilename(file));
   }
 });
-
 
 // ✅ Main upload middleware
 const upload = multer({ storage: defaultStorage, fileFilter });
@@ -251,7 +251,9 @@ module.exports = {
   ]),
   uploadStudyMaterial: multer({ storage: studyMaterialStorage, fileFilter }).single('file'),
   uploadGeneric: upload,
-  uploadCertificateTemplate: multer({ storage: certificateTemplateStorage, fileFilter }).single('image'), // 👈 for certificate templates
-  uploadAssignmentSubmission: multer({ storage: assignmentSubmissionStorage,limits: { fileSize: 25 * 1024 * 1024 } }).single('file')
-
+  uploadCertificateTemplate: multer({ storage: certificateTemplateStorage, fileFilter }).single('image'),
+  uploadAssignmentSubmission: multer({
+    storage: assignmentSubmissionStorage,
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
+  }).single('file'),
 };
